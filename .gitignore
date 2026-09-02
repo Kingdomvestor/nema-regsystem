@@ -32,3 +32,6 @@ npm-debug.log*
 
 # Claude Code local settings (machine-specific permissions)
 .claude/settings.local.json
+
+# Superpowers SDD scratch (ledger, briefs, review packages) — never commit
+.superpowers/
