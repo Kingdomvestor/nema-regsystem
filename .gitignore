@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build output
+dist/
+build/
+.vite/
+
+# Environment / secrets — NEVER commit Supabase keys
+.env
+.env.*
+!.env.example
+
+# Attendee PII — real registration data must never enter version control
+*.xlsx
+*.xls
+*.csv
+!docs/**/sample*.csv
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Logs
+*.log
+npm-debug.log*
