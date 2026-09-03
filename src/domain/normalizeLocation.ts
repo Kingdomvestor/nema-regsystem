@@ -1,6 +1,6 @@
 import type { CanonicalState, LocationResult } from './types'
 
-const CANONICAL_STATES: readonly CanonicalState[] = [
+export const CANONICAL_STATES: readonly CanonicalState[] = [
   'Kwara',
   'Lagos',
   'Ogun',

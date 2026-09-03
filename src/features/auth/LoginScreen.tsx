@@ -13,7 +13,7 @@ export function LoginScreen() {
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  if (!loading && session) return <Navigate to="/import" replace />
+  if (!loading && session) return <Navigate to="/attendees" replace />
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
