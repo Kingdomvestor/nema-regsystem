@@ -1,10 +1,21 @@
+import { Navigate, Route, Routes } from 'react-router-dom'
+import { ProtectedRoute } from './auth/ProtectedRoute'
+import { LoginScreen } from './features/auth/LoginScreen'
+import { ImportScreen } from './features/import/ImportScreen'
+
 export default function App() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-2 bg-slate-50 text-slate-900">
-      <h1 className="text-2xl font-semibold">Conference Reg</h1>
-      <p className="text-sm text-slate-500">
-        NEMA South West Zonal Conference 2026
-      </p>
-    </main>
+    <Routes>
+      <Route path="/login" element={<LoginScreen />} />
+      <Route
+        path="/import"
+        element={
+          <ProtectedRoute requireAdmin>
+            <ImportScreen />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="*" element={<Navigate to="/import" replace />} />
+    </Routes>
   )
 }
