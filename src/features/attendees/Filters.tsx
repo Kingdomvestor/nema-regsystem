@@ -1,9 +1,7 @@
 import { CANONICAL_STATES } from '../../domain/normalizeLocation'
 import type { AttendeeFilter } from './attendeesFilter'
 
-const control =
-  'h-9 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-700 shadow-sm ' +
-  'focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25'
+const control = 'futuristic-input h-10 w-full'
 
 export function Filters({
   value,
@@ -21,10 +19,10 @@ export function Filters({
   const set = (patch: Partial<AttendeeFilter>) => onChange({ ...value, ...patch })
 
   return (
-    <div className="space-y-3">
-      <div className="relative">
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(15rem,1fr)_8.75rem_8.75rem_11.75rem_9.5rem_9.75rem_6.75rem] lg:items-center">
+      <div className="relative min-w-0 sm:col-span-2 lg:col-span-1">
         <svg
-          className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+          className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-200/75"
           viewBox="0 0 20 20"
           fill="currentColor"
           aria-hidden="true"
@@ -40,71 +38,84 @@ export function Filters({
           value={value.search}
           onChange={(e) => set({ search: e.target.value })}
           placeholder="Search name, phone, email, or RegID"
-          className={'w-full pl-9 ' + control}
+          className="futuristic-input h-10 w-full pl-11"
+          aria-label="Search attendees by name, phone, email, or registration ID"
         />
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
-        <select value={value.state} onChange={(e) => set({ state: e.target.value })} className={control}>
-          <option value="all">All states</option>
-          {CANONICAL_STATES.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
+      <select
+        value={value.state}
+        onChange={(e) => set({ state: e.target.value })}
+        className={control}
+        aria-label="Filter by state"
+      >
+        <option value="all">All states</option>
+        {CANONICAL_STATES.map((s) => (
+          <option key={s} value={s}>
+            {s}
+          </option>
+        ))}
+      </select>
 
-        <select value={value.gender} onChange={(e) => set({ gender: e.target.value })} className={control}>
-          <option value="all">All genders</option>
-          {genders.map((g) => (
-            <option key={g} value={g}>
-              {g || '(blank)'}
-            </option>
-          ))}
-        </select>
+      <select
+        value={value.gender}
+        onChange={(e) => set({ gender: e.target.value })}
+        className={control}
+        aria-label="Filter by gender"
+      >
+        <option value="all">All genders</option>
+        {genders.map((g) => (
+          <option key={g} value={g}>
+            {g || '(blank)'}
+          </option>
+        ))}
+      </select>
 
-        <select
-          value={value.accommodation}
-          onChange={(e) => set({ accommodation: e.target.value as AttendeeFilter['accommodation'] })}
-          className={control}
-        >
-          <option value="all">All accommodation</option>
-          <option value="free_hostel">Free hostel</option>
-          <option value="private_paid">Private (paid)</option>
-          <option value="none">No choice</option>
-        </select>
+      <select
+        value={value.accommodation}
+        onChange={(e) => set({ accommodation: e.target.value as AttendeeFilter['accommodation'] })}
+        className={control}
+        aria-label="Filter by accommodation"
+      >
+        <option value="all">All accommodation</option>
+        <option value="free_hostel">Free hostel</option>
+        <option value="private_paid">Private (paid)</option>
+        <option value="none">No choice</option>
+      </select>
 
-        <select
-          value={value.arrived}
-          onChange={(e) => set({ arrived: e.target.value as AttendeeFilter['arrived'] })}
-          className={control}
-        >
-          <option value="all">Any arrival</option>
-          <option value="yes">Arrived</option>
-          <option value="no">Not arrived</option>
-        </select>
+      <select
+        value={value.arrived}
+        onChange={(e) => set({ arrived: e.target.value as AttendeeFilter['arrived'] })}
+        className={control}
+        aria-label="Filter by arrival status"
+      >
+        <option value="all">Any arrival</option>
+        <option value="yes">Arrived</option>
+        <option value="no">Not arrived</option>
+      </select>
 
-        <label
-          className={
-            'flex h-9 cursor-pointer items-center gap-2 rounded-lg border px-3 text-sm font-medium shadow-sm transition-colors ' +
-            (value.needsReview
-              ? 'border-amber-300 bg-amber-50 text-amber-700'
-              : 'border-slate-300 bg-white text-slate-600 hover:bg-slate-50')
-          }
-        >
-          <input
-            type="checkbox"
-            checked={value.needsReview}
-            onChange={(e) => set({ needsReview: e.target.checked })}
-            className="accent-amber-600"
-          />
-          Needs review
-        </label>
+      <label
+        className={
+          'flex h-10 cursor-pointer items-center justify-center gap-2 rounded-lg border px-3 text-sm font-semibold shadow-sm transition duration-200 focus-within:ring-2 focus-within:ring-amber-300/45 ' +
+          (value.needsReview
+            ? 'border-amber-300/50 bg-amber-300/14 text-amber-100 shadow-[0_0_22px_rgba(251,191,36,0.08)]'
+            : 'border-[#26343C] bg-white/[0.055] text-zinc-300 hover:border-amber-300/35 hover:bg-amber-300/8 hover:text-amber-100')
+        }
+      >
+        <input
+          type="checkbox"
+          checked={value.needsReview}
+          onChange={(e) => set({ needsReview: e.target.checked })}
+          className="accent-amber-300"
+        />
+        <span className="whitespace-nowrap">Needs review</span>
+      </label>
 
-        <span className="ml-auto text-sm text-slate-500">
-          <span className="font-semibold text-slate-700 tabular-nums">{resultCount}</span> of {total}
-        </span>
-      </div>
+      <span className="flex h-10 items-center justify-center rounded-lg border border-[#26343C] bg-[#111D24]/72 px-3 text-sm text-zinc-400">
+        <span className="font-semibold text-brand-100 tabular-nums">{resultCount}</span>
+        <span className="mx-1">of</span>
+        <span className="tabular-nums">{total}</span>
+      </span>
     </div>
   )
 }

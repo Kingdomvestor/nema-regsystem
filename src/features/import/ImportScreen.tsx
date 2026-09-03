@@ -1,6 +1,4 @@
 // Import screen: idle -> parsing -> preview -> committing -> done / error.
-// Upload runs the existing pure domain pipeline entirely in the browser (the
-// xlsx never leaves the machine); only cleaned rows are sent on commit.
 import { type ChangeEvent, useState } from 'react'
 import { parseWorkbook } from '../../domain/parseWorkbook'
 import { runImport } from '../../domain/runImport'
@@ -56,7 +54,7 @@ export function ImportScreen() {
   const busy = phase === 'parsing' || phase === 'committing'
 
   const filePicker = (
-    <label className="cursor-pointer rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-medium text-white hover:bg-brand-700">
+    <label className="primary-action cursor-pointer">
       {phase === 'idle' || phase === 'error' ? 'Choose .xlsx file' : 'Choose a different file'}
       <input type="file" accept=".xlsx,.xls" onChange={onFile} disabled={busy} className="hidden" />
     </label>
@@ -69,10 +67,10 @@ export function ImportScreen() {
       actions={filePicker}
     >
       <div className="space-y-6">
-        {phase === 'parsing' && <p className="text-sm text-slate-500">Reading and cleaning…</p>}
+        {phase === 'parsing' && <p className="text-sm text-zinc-400">Reading and cleaning...</p>}
 
         {error && (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>
+          <div className="rounded-lg border border-red-300/30 bg-red-400/10 p-3 text-sm text-red-200">{error}</div>
         )}
 
         {result && phase !== 'idle' && (
@@ -80,18 +78,14 @@ export function ImportScreen() {
             <StatsSummary stats={result.stats} />
 
             <Card className="flex flex-wrap items-center gap-3 p-4">
-              <button
-                onClick={onCommit}
-                disabled={busy || phase === 'done'}
-                className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500 disabled:opacity-50"
-              >
+              <button onClick={onCommit} disabled={busy || phase === 'done'} className="success-action">
                 {phase === 'committing'
-                  ? `Committing… ${progress}%`
+                  ? `Committing... ${progress}%`
                   : `Commit ${result.stats.total} attendees`}
               </button>
               {phase === 'done' && (
-                <span className="text-sm text-emerald-700">
-                  Committed {committed} rows. Re-importing is safe — check-in state is preserved.
+                <span className="text-sm text-[#bffcff]">
+                  Committed {committed} rows. Re-importing is safe; check-in state is preserved.
                 </span>
               )}
             </Card>

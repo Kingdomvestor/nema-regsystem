@@ -1,20 +1,181 @@
 @import "tailwindcss";
 
-/* Brand accent (indigo) — used for nav, primary actions, focus rings, brand mark. */
+/* Rich operations palette: black base, deep navy surfaces, saturated status accents. */
 @theme {
-  --color-brand-50: #eef2ff;
-  --color-brand-100: #e0e7ff;
-  --color-brand-200: #c7d2fe;
-  --color-brand-300: #a5b4fc;
-  --color-brand-400: #818cf8;
-  --color-brand-500: #6366f1;
-  --color-brand-600: #4f46e5;
-  --color-brand-700: #4338ca;
-  --color-brand-800: #3730a3;
+  --color-brand-50: rgb(238, 253, 255);
+  --color-brand-100: rgb(202, 249, 255);
+  --color-brand-200: rgb(90, 245, 255);
+  --color-brand-300: rgb(0, 226, 255);
+  --color-brand-400: rgb(0, 190, 230);
+  --color-brand-500: rgb(0, 143, 180);
+  --color-brand-600: rgb(0, 102, 135);
+  --color-brand-700: rgb(0, 70, 96);
+  --color-brand-800: rgb(0, 44, 62);
 }
 
 @layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  * {
+    scrollbar-color: rgba(0, 229, 255, 0.58) rgba(255, 255, 255, 0.08);
+  }
+
+  html {
+    min-height: 100%;
+    background: #000;
+  }
+
   body {
-    @apply bg-slate-50 text-slate-900 antialiased;
+    min-height: 100%;
+    background:
+      radial-gradient(circle at 14% 0%, rgba(0, 226, 255, 0.16), transparent 27rem),
+      radial-gradient(circle at 82% 12%, rgba(255, 58, 82, 0.12), transparent 28rem),
+      radial-gradient(circle at 55% 100%, rgba(16, 185, 129, 0.1), transparent 30rem),
+      linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.014) 1px, transparent 1px),
+      #000;
+    background-attachment: fixed;
+    background-size: auto, auto, auto, 56px 56px, 56px 56px, auto;
+    @apply text-zinc-100 antialiased;
+  }
+
+  body[data-display-mode="glow"] {
+    background:
+      radial-gradient(circle at 50% 18%, rgba(243, 247, 250, 0.34) 0, rgba(90, 245, 255, 0.22) 5rem, rgba(0, 226, 255, 0.11) 15rem, transparent 32rem),
+      radial-gradient(circle at 14% 0%, rgba(0, 226, 255, 0.14), transparent 27rem),
+      radial-gradient(circle at 82% 12%, rgba(255, 58, 82, 0.1), transparent 28rem),
+      linear-gradient(to right, rgba(255, 255, 255, 0.024) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+      #000;
+    background-attachment: fixed;
+    background-size: auto, auto, auto, 56px 56px, 56px 56px, auto;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    letter-spacing: 0;
+  }
+
+  ::selection {
+    @apply bg-brand-300 text-zinc-950;
+  }
+}
+
+@layer components {
+  .app-shell {
+    @apply min-h-screen text-zinc-100;
+  }
+
+  .mirror-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(44, 63, 72, 0.9);
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.055), rgba(8, 15, 20, 0.86) 42%, rgba(0, 226, 255, 0.06)),
+      linear-gradient(180deg, rgba(10, 18, 24, 0.98), rgba(1, 3, 6, 0.96));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 18px 48px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(22px) saturate(150%);
+  }
+
+  .mirror-card::before {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(118deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025) 20%, transparent 36%),
+      linear-gradient(298deg, transparent 58%, rgba(0, 226, 255, 0.075));
+    opacity: 0.52;
+  }
+
+  .mirror-card > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .mirror-card-quiet {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(44, 63, 72, 0.9);
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.048), rgba(8, 15, 20, 0.9) 48%, rgba(0, 226, 255, 0.055)),
+      linear-gradient(180deg, rgba(9, 16, 22, 0.98), rgba(1, 3, 6, 0.94));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 14px 42px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(20px) saturate(145%);
+  }
+
+  .table-surface {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(44, 63, 72, 0.9);
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.048), rgba(8, 15, 20, 0.9) 44%, rgba(0, 226, 255, 0.055)),
+      linear-gradient(180deg, rgba(8, 15, 20, 0.98), rgba(1, 3, 6, 0.96));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 18px 50px rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(22px) saturate(150%);
+  }
+
+  .futuristic-input {
+    @apply rounded-lg border border-[#304650] bg-[#03070B]/90 px-3 text-sm text-zinc-100 shadow-sm outline-none transition duration-200;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .futuristic-input::placeholder {
+    @apply text-zinc-500;
+  }
+
+  .futuristic-input:focus {
+    @apply border-brand-300/55 ring-2 ring-brand-300/25;
+  }
+
+  .primary-action {
+    @apply rounded-lg bg-brand-400 px-3.5 py-2 text-sm font-semibold text-zinc-950 shadow-sm transition duration-200 hover:bg-brand-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300/55 disabled:cursor-not-allowed disabled:opacity-50;
+    box-shadow: 0 0 22px rgba(0, 229, 255, 0.22);
+  }
+
+  .secondary-action {
+    @apply rounded-lg border border-[#304650] bg-white/[0.06] px-3.5 py-2 text-sm font-medium text-zinc-100 transition duration-200 hover:border-brand-300/45 hover:bg-brand-300/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300/50 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .danger-action {
+    @apply rounded-lg border border-red-300/30 bg-red-400/10 px-3.5 py-2 text-sm font-medium text-red-200 transition duration-200 hover:bg-red-400/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/45 disabled:cursor-not-allowed disabled:opacity-45;
+  }
+
+  .success-action {
+    @apply rounded-lg border border-brand-200/50 bg-brand-300 px-3.5 py-2 text-sm font-semibold text-[#00171f] shadow-sm transition duration-200 hover:bg-brand-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300/55 disabled:cursor-not-allowed disabled:opacity-50;
+    box-shadow: 0 0 22px rgba(0, 229, 255, 0.22);
+  }
+
+  .ghost-action {
+    @apply rounded-lg px-3 py-2 text-sm font-medium text-zinc-300 transition duration-200 hover:bg-white/[0.08] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300/45;
+  }
+
+  .metric-action {
+    @apply inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-[#304650] bg-white/[0.055] px-3 text-sm font-medium text-zinc-100 transition duration-200 hover:border-brand-300/45 hover:bg-brand-300/12 hover:text-brand-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300/45;
+  }
+
+  .field-label {
+    @apply text-xs font-medium text-zinc-400;
+  }
+
+  .chip {
+    @apply rounded-full border border-[#304650] bg-white/[0.06] px-2.5 py-0.5 text-xs text-zinc-300;
+  }
+
+  .section-label {
+    @apply text-xs font-semibold uppercase text-brand-200/70;
   }
 }

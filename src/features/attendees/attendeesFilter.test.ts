@@ -19,6 +19,8 @@ function rec(over: Partial<AttendeeRecord>): AttendeeRecord {
     accommodation_choice: 'free_hostel',
     private_room_type: null,
     arrived: false,
+    arrived_at: null,
+    checked_in_by: null,
     dupe_flag: false,
     review_flags: { location: false, accommodation: false, duplicate: false },
     notes: null,

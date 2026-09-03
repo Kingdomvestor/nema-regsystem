@@ -1,5 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { AppLayout } from '../../components/AppLayout'
+import { Card, StatCard } from '../../components/ui'
 import { fetchRooms, createRoom, updateRoom, deleteRoom } from './roomsApi'
+
+const input = 'futuristic-input h-10 w-full'
 
 export function RoomsScreen() {
   const [rooms, setRooms] = useState<any[]>([])
@@ -25,11 +29,21 @@ export function RoomsScreen() {
     }
   }
 
-  useEffect(() => { reload() }, [])
+  useEffect(() => {
+    void reload()
+  }, [])
 
   function resetForm() {
     setEditing(null)
-    setForm({ block: '', room_number: '', capacity: 1, gender_designation: 'any', room_class: 'hostel', accessible: false, notes: '' })
+    setForm({
+      block: '',
+      room_number: '',
+      capacity: 1,
+      gender_designation: 'any',
+      room_class: 'hostel',
+      accessible: false,
+      notes: '',
+    })
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -46,7 +60,9 @@ export function RoomsScreen() {
     } catch (err: any) {
       console.error(err)
       alert(err.message || 'Save failed')
-    } finally { setBusy(false) }
+    } finally {
+      setBusy(false)
+    }
   }
 
   async function handleEdit(r: any) {
@@ -71,60 +87,178 @@ export function RoomsScreen() {
     } catch (err: any) {
       console.error(err)
       alert(err.message || 'Delete failed')
-    } finally { setBusy(false) }
+    } finally {
+      setBusy(false)
+    }
   }
 
+  const stats = useMemo(
+    () => ({
+      rooms: rooms.length,
+      capacity: rooms.reduce((sum, r) => sum + Number(r.capacity || 0), 0),
+      accessible: rooms.filter((r) => r.accessible).length,
+      privateRooms: rooms.filter((r) => String(r.room_class || '').startsWith('private')).length,
+    }),
+    [rooms],
+  )
+
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-semibold mb-4">Rooms</h2>
+    <AppLayout title="Rooms" subtitle="Create room inventory and tune accommodation capacity.">
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <StatCard label="Rooms" value={stats.rooms} tone="brand" />
+          <StatCard label="Capacity" value={stats.capacity} />
+          <StatCard label="Accessible" value={stats.accessible} tone="blue" />
+          <StatCard label="Private" value={stats.privateRooms} tone="amber" />
+        </div>
 
-      <form className="mb-6 space-y-2 max-w-lg" onSubmit={handleSubmit}>
-        <div className="grid grid-cols-2 gap-2">
-          <input value={form.block} onChange={(e) => setForm({ ...form, block: e.target.value })} placeholder="Block" className="border p-2" required />
-          <input value={form.room_number} onChange={(e) => setForm({ ...form, room_number: e.target.value })} placeholder="Room number" className="border p-2" required />
-        </div>
-        <div className="grid grid-cols-3 gap-2">
-          <input type="number" min={1} value={form.capacity} onChange={(e) => setForm({ ...form, capacity: Number(e.target.value) })} className="border p-2" />
-          <select value={form.gender_designation} onChange={(e) => setForm({ ...form, gender_designation: e.target.value })} className="border p-2">
-            <option value="any">Any</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-          </select>
-          <select value={form.room_class} onChange={(e) => setForm({ ...form, room_class: e.target.value })} className="border p-2">
-            <option value="hostel">Hostel</option>
-            <option value="private_fan">Private (Fan)</option>
-            <option value="private_ac">Private (AC)</option>
-          </select>
-        </div>
-        <div className="flex items-center gap-2">
-          <label className="flex items-center gap-2"><input type="checkbox" checked={form.accessible} onChange={(e) => setForm({ ...form, accessible: e.target.checked })} /> Accessible</label>
-        </div>
-        <div>
-          <textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="Notes" className="border w-full p-2" />
-        </div>
-        <div className="flex gap-2">
-          <button className="px-4 py-2 bg-green-600 text-white rounded" disabled={busy}>{editing ? 'Save' : 'Create'}</button>
-          <button type="button" className="px-4 py-2 bg-gray-200 rounded" onClick={resetForm} disabled={busy}>Cancel</button>
-          {editing && <button type="button" className="px-4 py-2 bg-red-600 text-white rounded ml-auto" onClick={() => handleDelete(editing.id)} disabled={busy}>Delete</button>}
-        </div>
-      </form>
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,28rem)_1fr]">
+          <Card className="p-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
+              <div>
+                <h2 className="text-base font-semibold text-zinc-50">
+                  {editing ? 'Edit room' : 'Create room'}
+                </h2>
+                <p className="mt-1 text-sm text-zinc-400">Room details are used by allocation rules.</p>
+              </div>
 
-      <div className="space-y-2">
-        {rooms.map((r) => (
-          <div key={r.id} className="flex justify-between border-b py-2">
-            <div>
-              <div className="font-medium">{r.block} {r.room_number}</div>
-              <div className="text-sm text-gray-600">cap {r.capacity} · {r.room_class} · {r.gender_designation}</div>
+              <div className="grid grid-cols-2 gap-2">
+                <label className="block">
+                  <span className="field-label">Block</span>
+                  <input
+                    value={form.block}
+                    onChange={(e) => setForm({ ...form, block: e.target.value })}
+                    placeholder="Block"
+                    className={input}
+                    required
+                  />
+                </label>
+                <label className="block">
+                  <span className="field-label">Room number</span>
+                  <input
+                    value={form.room_number}
+                    onChange={(e) => setForm({ ...form, room_number: e.target.value })}
+                    placeholder="Room number"
+                    className={input}
+                    required
+                  />
+                </label>
+              </div>
+
+              <div className="grid gap-2 sm:grid-cols-3">
+                <label className="block">
+                  <span className="field-label">Capacity</span>
+                  <input
+                    type="number"
+                    min={1}
+                    value={form.capacity}
+                    onChange={(e) => setForm({ ...form, capacity: Number(e.target.value) })}
+                    className={input}
+                  />
+                </label>
+                <label className="block">
+                  <span className="field-label">Gender</span>
+                  <select
+                    value={form.gender_designation}
+                    onChange={(e) => setForm({ ...form, gender_designation: e.target.value })}
+                    className={input}
+                  >
+                    <option value="any">Any</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                  </select>
+                </label>
+                <label className="block">
+                  <span className="field-label">Class</span>
+                  <select
+                    value={form.room_class}
+                    onChange={(e) => setForm({ ...form, room_class: e.target.value })}
+                    className={input}
+                  >
+                    <option value="hostel">Hostel</option>
+                    <option value="private_fan">Private (Fan)</option>
+                    <option value="private_ac">Private (AC)</option>
+                  </select>
+                </label>
+              </div>
+
+              <label className="flex items-center gap-2 text-sm text-zinc-300">
+                <input
+                  type="checkbox"
+                  checked={form.accessible}
+                  onChange={(e) => setForm({ ...form, accessible: e.target.checked })}
+                  className="accent-brand-300"
+                />
+                Accessible
+              </label>
+
+              <label className="block">
+                <span className="field-label">Notes</span>
+                <textarea
+                  value={form.notes}
+                  onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                  placeholder="Notes"
+                  className="futuristic-input min-h-24 w-full py-2"
+                />
+              </label>
+
+              <div className="flex flex-wrap gap-2">
+                <button className="success-action" disabled={busy}>
+                  {editing ? 'Save' : 'Create'}
+                </button>
+                <button type="button" className="secondary-action" onClick={resetForm} disabled={busy}>
+                  Cancel
+                </button>
+                {editing && (
+                  <button
+                    type="button"
+                    className="danger-action ml-auto"
+                    onClick={() => void handleDelete(editing.id)}
+                    disabled={busy}
+                  >
+                    Delete
+                  </button>
+                )}
+              </div>
+            </form>
+          </Card>
+
+          <Card className="p-4">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <h2 className="text-base font-semibold text-zinc-50">Room inventory</h2>
+              <span className="chip">{rooms.length} total</span>
             </div>
-            <div className="flex items-center gap-2">
-              <button className="px-3 py-1 bg-blue-600 text-white rounded" onClick={() => handleEdit(r)}>Edit</button>
-              <button className="px-3 py-1 bg-red-500 text-white rounded" onClick={() => handleDelete(r.id)}>Delete</button>
+            <div className="space-y-2">
+              {rooms.map((r) => (
+                <div
+                  key={r.id}
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/6 px-3 py-3"
+                >
+                  <div>
+                    <div className="font-medium text-zinc-100">
+                      {r.block} {r.room_number}
+                    </div>
+                    <div className="text-sm text-zinc-400">
+                      cap {r.capacity} - {r.room_class} - {r.gender_designation}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {r.accessible && <span className="chip border-white/35 text-[#bffcff]">Accessible</span>}
+                    <button className="secondary-action px-3 py-1.5" onClick={() => void handleEdit(r)}>
+                      Edit
+                    </button>
+                    <button className="danger-action px-3 py-1.5" onClick={() => void handleDelete(r.id)}>
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {rooms.length === 0 && <div className="py-8 text-center text-sm text-zinc-400">No rooms defined yet.</div>}
             </div>
-          </div>
-        ))}
-        {rooms.length === 0 && <div className="text-gray-500">No rooms defined yet.</div>}
+          </Card>
+        </div>
       </div>
-    </div>
+    </AppLayout>
   )
 }
 

@@ -1,6 +1,6 @@
 // Types for the Attendees screen. AttendeeRecord is a snake_case row as stored in
-// public.attendees; EditablePatch structurally excludes id, raw/audit columns, and
-// every operational (check-in) column so the screen can never write check-in state.
+// public.attendees; EditablePatch excludes id, raw/audit columns, and check-in
+// columns. Arrival updates go through a focused action instead.
 import type {
   AccommodationChoice,
   CanonicalState,
@@ -24,6 +24,8 @@ export interface AttendeeRecord {
   accommodation_choice: AccommodationChoice | null
   private_room_type: PrivateRoomType
   arrived: boolean
+  arrived_at: string | null
+  checked_in_by: string | null
   dupe_flag: boolean
   review_flags: ReviewFlags
   notes: string | null

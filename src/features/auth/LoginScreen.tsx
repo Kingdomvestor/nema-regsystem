@@ -1,6 +1,4 @@
-// Email + password sign-in. On success the AuthProvider listener picks up the
-// session and the redirect below fires. No public sign-up — staff are
-// provisioned in the Supabase dashboard (spec §5.4).
+// Email + password sign-in. Staff are provisioned in the Supabase dashboard.
 import { type FormEvent, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../../auth/useAuth'
@@ -25,47 +23,49 @@ export function LoginScreen() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 text-slate-900">
-      <form
-        onSubmit={onSubmit}
-        className="w-full max-w-sm space-y-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
-      >
-        <div>
-          <h1 className="text-lg font-semibold">Conference Reg</h1>
-          <p className="text-sm text-slate-500">Staff sign-in</p>
+    <main className="app-shell flex items-center justify-center px-4 py-10">
+      <form onSubmit={onSubmit} className="mirror-card w-full max-w-sm space-y-5 p-6">
+        <div className="space-y-3">
+          <span className="grid h-10 w-10 place-items-center rounded-lg border border-white/40 bg-brand-300/15 text-sm font-bold text-brand-100 shadow-[0_0_28px_rgba(0,229,255,0.38)]">
+            NE
+          </span>
+          <div>
+            <h1 className="text-xl font-semibold tracking-tight text-zinc-50">Conference Reg</h1>
+            <p className="mt-1 text-sm text-zinc-400">Staff sign-in</p>
+          </div>
         </div>
 
         <label className="block text-sm">
-          Email
+          <span className="field-label">Email</span>
           <input
             type="email"
             required
             autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 w-full rounded border border-slate-300 px-2 py-1"
+            className="futuristic-input mt-1 h-10 w-full"
           />
         </label>
 
         <label className="block text-sm">
-          Password
+          <span className="field-label">Password</span>
           <input
             type="password"
             required
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 w-full rounded border border-slate-300 px-2 py-1"
+            className="futuristic-input mt-1 h-10 w-full"
           />
         </label>
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && (
+          <p className="rounded-lg border border-red-300/30 bg-red-400/10 px-3 py-2 text-sm text-red-200">
+            {error}
+          </p>
+        )}
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full rounded bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
-        >
+        <button type="submit" disabled={submitting} className="primary-action w-full">
           {submitting ? 'Signing in...' : 'Sign in'}
         </button>
       </form>
