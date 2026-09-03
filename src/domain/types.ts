@@ -50,3 +50,74 @@ export interface DuplicateFlag {
   byPhone: boolean
   byEmail: boolean
 }
+
+/**
+ * One raw registration row, columns A–M (0–12) of the Google-Forms export
+ * mapped positionally (Task 6). Every field is a string — cleaning happens later.
+ */
+export interface RawRow {
+  timestamp: string
+  fullName: string
+  whatsapp: string
+  email: string
+  ageGroup: string
+  location: string
+  occupation: string
+  gender: string
+  maritalStatus: string
+  firstTimeAttending: string
+  howHeard: string
+  accommodationOptions: string
+  privateRoomType: string
+}
+
+/** The three review gates surfaced per attendee (Task 7). */
+export interface ReviewFlags {
+  location: boolean
+  accommodation: boolean
+  duplicate: boolean
+}
+
+/** A single attendee after cleaning, normalization, and flagging (Task 7). */
+export interface CleanedAttendee {
+  regId: string
+  fullName: string
+  whatsapp: string
+  email: string
+  ageGroup: string
+  /** Original location cell, preserved verbatim for review. */
+  locationRaw: string
+  /** Normalized state, or null when unknown/ambiguous. */
+  state: CanonicalState | null
+  occupation: string
+  gender: string
+  maritalStatus: string
+  firstTime: boolean
+  heardVia: string
+  accommodationChoice: AccommodationChoice | null
+  privateRoomType: PrivateRoomType
+  /** Form-submission timestamp (raw). */
+  registeredAt: string
+  reviewFlags: ReviewFlags
+}
+
+/** Headline counts for the import preview / dashboard (Task 7). */
+export interface ImportStats {
+  total: number
+  /** Count per canonical state; null/unmapped counted under 'Unknown'. */
+  byState: Record<string, number>
+  /** Count per raw gender string. */
+  byGender: Record<string, number>
+  /** Attendees with any review flag set. */
+  needingReview: number
+  /** Attendees flagged as a likely duplicate. */
+  duplicates: number
+  /** Attendees whose accommodation columns contradict each other. */
+  accommodationConflicts: number
+}
+
+/** The full result of running an import over raw rows (Task 7). */
+export interface ImportResult {
+  attendees: CleanedAttendee[]
+  stats: ImportStats
+}
