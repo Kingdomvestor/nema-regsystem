@@ -121,3 +121,31 @@ export interface ImportResult {
   attendees: CleanedAttendee[]
   stats: ImportStats
 }
+
+/**
+ * Types used by the allocation engine (separate from the import pipeline).
+ * These are intentionally lightweight and pure — no I/O.
+ */
+export interface AttendeeForAllocation {
+  regId: string
+  state: CanonicalState | null
+  gender: string
+  accommodationChoice: AccommodationChoice | null
+  privateRoomType: PrivateRoomType
+  pinnedRoomId?: string | null
+}
+
+export type RoomGenderDesignation = 'male' | 'female' | 'any'
+export type RoomClass = 'hostel' | 'private_fan' | 'private_ac'
+
+export interface Room {
+  id: string
+  capacity: number
+  genderDesignation: RoomGenderDesignation
+  roomClass: RoomClass
+}
+
+export interface AllocationResult {
+  attendeeId: string
+  roomId: string | null
+}
