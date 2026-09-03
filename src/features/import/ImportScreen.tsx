@@ -5,7 +5,8 @@ import { type ChangeEvent, useState } from 'react'
 import { parseWorkbook } from '../../domain/parseWorkbook'
 import { runImport } from '../../domain/runImport'
 import type { ImportResult } from '../../domain/types'
-import { TopBar } from '../../components/TopBar'
+import { AppLayout } from '../../components/AppLayout'
+import { Card } from '../../components/ui'
 import { commitImport } from './commitImport'
 import { PreviewTable } from './PreviewTable'
 import { StatsSummary } from './StatsSummary'
@@ -54,49 +55,38 @@ export function ImportScreen() {
 
   const busy = phase === 'parsing' || phase === 'committing'
 
-  return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
-      <TopBar />
-      <main className="mx-auto max-w-5xl space-y-6 p-4 sm:p-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h1 className="text-xl font-semibold">Import attendees</h1>
-            <p className="text-sm text-slate-500">
-              Upload the registration spreadsheet, review the cleaned result, then commit.
-            </p>
-          </div>
-          <label className="cursor-pointer rounded bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800">
-            {phase === 'idle' || phase === 'error' ? 'Choose .xlsx file' : 'Choose a different file'}
-            <input
-              type="file"
-              accept=".xlsx,.xls"
-              onChange={onFile}
-              disabled={busy}
-              className="hidden"
-            />
-          </label>
-        </div>
+  const filePicker = (
+    <label className="cursor-pointer rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-medium text-white hover:bg-brand-700">
+      {phase === 'idle' || phase === 'error' ? 'Choose .xlsx file' : 'Choose a different file'}
+      <input type="file" accept=".xlsx,.xls" onChange={onFile} disabled={busy} className="hidden" />
+    </label>
+  )
 
-        {phase === 'parsing' && <p className="text-sm text-slate-500">Reading and cleaning...</p>}
+  return (
+    <AppLayout
+      title="Import attendees"
+      subtitle="Upload the registration spreadsheet, review the cleaned result, then commit."
+      actions={filePicker}
+    >
+      <div className="space-y-6">
+        {phase === 'parsing' && <p className="text-sm text-slate-500">Reading and cleaning…</p>}
 
         {error && (
-          <div className="rounded border border-red-300 bg-red-50 p-3 text-sm text-red-700">
-            {error}
-          </div>
+          <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>
         )}
 
         {result && phase !== 'idle' && (
           <>
             <StatsSummary stats={result.stats} />
 
-            <div className="flex flex-wrap items-center gap-3">
+            <Card className="flex flex-wrap items-center gap-3 p-4">
               <button
                 onClick={onCommit}
                 disabled={busy || phase === 'done'}
-                className="rounded bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-500 disabled:opacity-50"
+                className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500 disabled:opacity-50"
               >
                 {phase === 'committing'
-                  ? `Committing... ${progress}%`
+                  ? `Committing… ${progress}%`
                   : `Commit ${result.stats.total} attendees`}
               </button>
               {phase === 'done' && (
@@ -104,12 +94,12 @@ export function ImportScreen() {
                   Committed {committed} rows. Re-importing is safe — check-in state is preserved.
                 </span>
               )}
-            </div>
+            </Card>
 
             <PreviewTable attendees={result.attendees} />
           </>
         )}
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   )
 }

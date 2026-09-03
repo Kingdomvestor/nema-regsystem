@@ -3,10 +3,11 @@
 // library this cycle (spec §2). Delete is admin-only, both here and via RLS.
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../../auth/useAuth'
-import { TopBar } from '../../components/TopBar'
+import { AppLayout } from '../../components/AppLayout'
+import { Card, StatCard } from '../../components/ui'
 import { AttendeeEditPanel } from './AttendeeEditPanel'
 import { deleteAttendee, fetchAttendees, updateAttendee } from './attendeesApi'
-import { type AttendeeFilter, emptyFilter, filterAttendees } from './attendeesFilter'
+import { type AttendeeFilter, emptyFilter, filterAttendees, rowNeedsReview } from './attendeesFilter'
 import { AttendeesTable } from './AttendeesTable'
 import { Filters } from './Filters'
 import type { AttendeeRecord, EditablePatch } from './types'
@@ -46,6 +47,16 @@ export function AttendeesScreen() {
   const filtered = useMemo(() => filterAttendees(records, filter), [records, filter])
   const selected = records.find((r) => r.id === selectedId) ?? null
 
+  const stats = useMemo(
+    () => ({
+      total: records.length,
+      review: records.filter(rowNeedsReview).length,
+      duplicates: records.filter((r) => r.review_flags.duplicate).length,
+      arrived: records.filter((r) => r.arrived).length,
+    }),
+    [records],
+  )
+
   async function onSave(patch: EditablePatch) {
     if (!selectedId) return
     setSaving(true)
@@ -76,34 +87,40 @@ export function AttendeesScreen() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
-      <TopBar />
-      <main className="mx-auto max-w-6xl space-y-4 p-4">
-        <h1 className="text-lg font-semibold">Attendees</h1>
-
+    <AppLayout title="Attendees" subtitle="Search, review, and edit registrations.">
+      <div className="space-y-4">
         {loadError && (
-          <div className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {loadError}{' '}
-            <button onClick={() => void load()} className="underline">
+            <button onClick={() => void load()} className="font-medium underline">
               Retry
             </button>
           </div>
         )}
 
-        <Filters
-          value={filter}
-          onChange={setFilter}
-          genders={genders}
-          resultCount={filtered.length}
-          total={records.length}
-        />
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <StatCard label="Total" value={stats.total} tone="brand" />
+          <StatCard label="Needs review" value={stats.review} tone={stats.review > 0 ? 'amber' : 'default'} />
+          <StatCard label="Duplicates" value={stats.duplicates} tone={stats.duplicates > 0 ? 'red' : 'default'} />
+          <StatCard label="Arrived" value={stats.arrived} tone={stats.arrived > 0 ? 'green' : 'default'} />
+        </div>
+
+        <Card className="p-4">
+          <Filters
+            value={filter}
+            onChange={setFilter}
+            genders={genders}
+            resultCount={filtered.length}
+            total={records.length}
+          />
+        </Card>
 
         {loading ? (
-          <p className="py-8 text-center text-slate-400">Loading…</p>
+          <Card className="p-12 text-center text-slate-400">Loading…</Card>
         ) : (
           <AttendeesTable rows={filtered} selectedId={selectedId} onSelect={setSelectedId} />
         )}
-      </main>
+      </div>
 
       {selected && (
         <AttendeeEditPanel
@@ -120,6 +137,6 @@ export function AttendeesScreen() {
           onDelete={onDelete}
         />
       )}
-    </div>
+    </AppLayout>
   )
 }

@@ -51,15 +51,26 @@ function seed(r: AttendeeRecord): FormState {
   }
 }
 
-const input = 'mt-1 w-full rounded border border-slate-300 px-2 py-1 text-sm'
+const input =
+  'mt-1 h-9 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 ' +
+  'focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25'
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="block text-sm">
-      <span className="text-slate-600">{label}</span>
+      <span className="text-xs font-medium text-slate-500">{label}</span>
       {children}
     </label>
   )
+}
+
+function SectionTitle({ children }: { children: ReactNode }) {
+  return <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-400">{children}</h3>
+}
+
+function initial(name: string): string {
+  const c = name.trim()[0]
+  return c ? c.toUpperCase() : '?'
 }
 
 export function AttendeeEditPanel({
@@ -117,22 +128,30 @@ export function AttendeeEditPanel({
 
   return (
     <div className="fixed inset-0 z-40 flex justify-end">
-      <div className="absolute inset-0 bg-black/20" onClick={onClose} />
-      <aside className="relative z-10 flex h-full w-full max-w-md flex-col bg-white shadow-xl">
-        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-          <div>
-            <div className="font-semibold">{record.full_name}</div>
-            <div className="font-mono text-xs text-slate-400">{record.id}</div>
+      <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
+      <aside className="relative z-10 flex h-full w-full max-w-md flex-col bg-white shadow-2xl">
+        <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-5 py-4">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-100 text-sm font-semibold text-brand-700">
+              {initial(record.full_name)}
+            </span>
+            <div className="min-w-0">
+              <div className="truncate font-semibold text-slate-900">{record.full_name}</div>
+              <div className="font-mono text-xs text-slate-400">{record.id}</div>
+            </div>
           </div>
-          <button onClick={onClose} className="rounded px-2 py-1 text-slate-500 hover:bg-slate-100">
+          <button
+            onClick={onClose}
+            className="shrink-0 rounded-lg px-2.5 py-1.5 text-sm text-slate-500 hover:bg-slate-100"
+          >
             Close
           </button>
         </div>
 
-        <div className="flex-1 space-y-5 overflow-auto px-4 py-4">
+        <div className="flex-1 space-y-6 overflow-auto px-5 py-5">
           {/* Identity */}
           <section className="space-y-3">
-            <h3 className="text-xs font-semibold uppercase text-slate-400">Identity</h3>
+            <SectionTitle>Identity</SectionTitle>
             <Field label="Full name">
               <input className={input} value={form.full_name} onChange={(e) => set({ full_name: e.target.value })} />
             </Field>
@@ -146,7 +165,7 @@ export function AttendeeEditPanel({
 
           {/* Classification */}
           <section className="space-y-3">
-            <h3 className="text-xs font-semibold uppercase text-slate-400">Classification</h3>
+            <SectionTitle>Classification</SectionTitle>
             <Field label={`State (raw: ${record.location_raw || '—'})`}>
               <select
                 className={input}
@@ -180,11 +199,12 @@ export function AttendeeEditPanel({
             <Field label="Heard via">
               <input className={input} value={form.heard_via} onChange={(e) => set({ heard_via: e.target.value })} />
             </Field>
-            <label className="flex items-center gap-2 text-sm">
+            <label className="flex items-center gap-2 text-sm text-slate-700">
               <input
                 type="checkbox"
                 checked={form.first_time}
                 onChange={(e) => set({ first_time: e.target.checked })}
+                className="accent-brand-600"
               />
               First-time attendee
             </label>
@@ -221,9 +241,9 @@ export function AttendeeEditPanel({
 
           {/* Notes */}
           <section className="space-y-3">
-            <h3 className="text-xs font-semibold uppercase text-slate-400">Notes</h3>
+            <SectionTitle>Notes</SectionTitle>
             <textarea
-              className={input}
+              className={input.replace('h-9', 'h-auto py-2')}
               rows={3}
               value={form.notes}
               onChange={(e) => set({ notes: e.target.value })}
@@ -232,15 +252,15 @@ export function AttendeeEditPanel({
 
           {/* Review flags */}
           <section className="space-y-2">
-            <h3 className="text-xs font-semibold uppercase text-slate-400">Review flags</h3>
+            <SectionTitle>Review flags</SectionTitle>
             {!anyFlag && <p className="text-sm text-slate-400">No open flags.</p>}
             {flags.location && (
-              <div className="flex items-center justify-between rounded border border-amber-200 bg-amber-50 px-3 py-2 text-sm">
+              <div className="flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
                 <span>Location needs review</span>
                 <button
                   disabled={form.state === null}
                   onClick={() => applyResolve(resolveLocation(flags, form.state as CanonicalState))}
-                  className="rounded bg-amber-600 px-2 py-1 text-xs text-white disabled:opacity-40"
+                  className="rounded-md bg-amber-600 px-2.5 py-1 text-xs font-medium text-white hover:bg-amber-700 disabled:opacity-40"
                   title={form.state === null ? 'Pick a state above first' : undefined}
                 >
                   Mark resolved
@@ -248,14 +268,14 @@ export function AttendeeEditPanel({
               </div>
             )}
             {flags.accommodation && (
-              <div className="flex items-center justify-between rounded border border-orange-200 bg-orange-50 px-3 py-2 text-sm">
+              <div className="flex items-center justify-between rounded-lg border border-orange-200 bg-orange-50 px-3 py-2 text-sm text-orange-800">
                 <span>Accommodation needs review</span>
                 <button
                   disabled={form.accommodation_choice === null}
                   onClick={() =>
                     applyResolve(resolveAccommodation(flags, form.accommodation_choice as AccommodationChoice, form.private_room_type))
                   }
-                  className="rounded bg-orange-600 px-2 py-1 text-xs text-white disabled:opacity-40"
+                  className="rounded-md bg-orange-600 px-2.5 py-1 text-xs font-medium text-white hover:bg-orange-700 disabled:opacity-40"
                   title={form.accommodation_choice === null ? 'Pick an accommodation above first' : undefined}
                 >
                   Mark resolved
@@ -263,11 +283,11 @@ export function AttendeeEditPanel({
               </div>
             )}
             {flags.duplicate && (
-              <div className="flex items-center justify-between rounded border border-red-200 bg-red-50 px-3 py-2 text-sm">
+              <div className="flex items-center justify-between rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
                 <span>Possible duplicate</span>
                 <button
                   onClick={() => applyResolve(dismissDuplicate(flags))}
-                  className="rounded bg-slate-700 px-2 py-1 text-xs text-white"
+                  className="rounded-md bg-slate-700 px-2.5 py-1 text-xs font-medium text-white hover:bg-slate-800"
                 >
                   Not a duplicate
                 </button>
@@ -276,14 +296,14 @@ export function AttendeeEditPanel({
           </section>
         </div>
 
-        <div className="space-y-2 border-t border-slate-200 px-4 py-3">
+        <div className="space-y-2 border-t border-slate-200 px-5 py-4">
           {error && <p className="text-sm text-red-600">{error}</p>}
           <div className="flex items-center justify-between">
             {canDelete ? (
               <button
                 onClick={confirmDelete}
                 disabled={saving}
-                className="rounded border border-red-300 px-3 py-2 text-sm text-red-700 hover:bg-red-50 disabled:opacity-50"
+                className="rounded-lg border border-red-300 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-50"
               >
                 Delete
               </button>
@@ -293,7 +313,7 @@ export function AttendeeEditPanel({
             <button
               onClick={save}
               disabled={saving}
-              className="rounded bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
+              className="rounded-lg bg-brand-600 px-5 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50"
             >
               {saving ? 'Saving…' : 'Save'}
             </button>
