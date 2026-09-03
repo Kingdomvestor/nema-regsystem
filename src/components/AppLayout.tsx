@@ -44,9 +44,20 @@ export function AppLayout({
                 Attendees
               </NavLink>
               {isAdmin && (
-                <NavLink to="/import" className={tabClass}>
-                  Import
-                </NavLink>
+                <>
+                  <NavLink to="/import" className={tabClass}>
+                    Import
+                  </NavLink>
+                  <NavLink to="/rooms" className={tabClass}>
+                    Rooms
+                  </NavLink>
+                  <NavLink to="/allocations" className={tabClass}>
+                    Allocations
+                  </NavLink>
+                  <NavLink to="/meals" className={tabClass}>
+                    Meals
+                  </NavLink>
+                </>
               )}
             </nav>
           </div>
