@@ -6,11 +6,21 @@ import { ImportScreen } from './features/import/ImportScreen'
 import RoomsScreen from './features/rooms/RoomsScreen'
 import AllocationScreen from './features/allocations/AllocationScreen'
 import MealsScreen from './features/meals/MealsScreen'
+import DashboardScreen from './features/dashboard/DashboardScreen'
+import CheckinScreen from './features/checkin/CheckinScreen'
 
 export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginScreen />} />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <DashboardScreen />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/import"
         element={
@@ -24,6 +34,14 @@ export default function App() {
         element={
           <ProtectedRoute>
             <AttendeesScreen />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/checkin"
+        element={
+          <ProtectedRoute>
+            <CheckinScreen />
           </ProtectedRoute>
         }
       />
@@ -51,7 +69,7 @@ export default function App() {
           </ProtectedRoute>
         }
       />
-      <Route path="*" element={<Navigate to="/attendees" replace />} />
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   )
 }

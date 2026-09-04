@@ -7,9 +7,20 @@ export interface CommitAllocation {
 }
 
 export async function commitAllocations(rows: CommitAllocation[]): Promise<void> {
+  const { data: existing, error: existingError } = await supabase
+    .from('allocations')
+    .select('attendee_id,room_id,pinned')
+    .in('attendee_id', rows.map((row) => row.attendeeId))
+  if (existingError) throw new Error(existingError.message)
+
+  const pinned = new Map(
+    (existing ?? [])
+      .filter((allocation) => allocation.pinned)
+      .map((allocation) => [allocation.attendee_id, allocation.room_id]),
+  )
   const payload = rows
-    .filter((r) => r.roomId)
-    .map((r) => ({ attendee_id: r.attendeeId, room_id: r.roomId, pinned: !!r.pinned }))
+    .filter((row) => row.roomId && (!pinned.has(row.attendeeId) || pinned.get(row.attendeeId) === row.roomId))
+    .map((row) => ({ attendee_id: row.attendeeId, room_id: row.roomId, pinned: !!row.pinned || pinned.has(row.attendeeId) }))
 
   if (payload.length === 0) return
 
@@ -30,6 +41,11 @@ export async function pinAllocation(attendeeId: string, roomId: string): Promise
 }
 
 export async function unpinAllocation(attendeeId: string): Promise<void> {
+  const { error } = await supabase.from('allocations').delete().eq('attendee_id', attendeeId)
+  if (error) throw new Error(error.message)
+}
+
+export async function removeAllocation(attendeeId: string): Promise<void> {
   const { error } = await supabase.from('allocations').delete().eq('attendee_id', attendeeId)
   if (error) throw new Error(error.message)
 }

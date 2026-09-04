@@ -128,6 +128,11 @@ export interface ImportResult {
  */
 export interface AttendeeForAllocation {
   regId: string
+  fullName?: string
+  whatsapp?: string
+  email?: string
+  togetherGroup?: string | null
+  accessibilityRequired?: boolean
   state: CanonicalState | null
   gender: string
   accommodationChoice: AccommodationChoice | null
@@ -143,6 +148,7 @@ export interface Room {
   capacity: number
   genderDesignation: RoomGenderDesignation
   roomClass: RoomClass
+  accessible?: boolean
 }
 
 export interface AllocationResult {

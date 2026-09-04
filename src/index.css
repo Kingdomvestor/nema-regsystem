@@ -179,3 +179,38 @@
     @apply text-xs font-semibold uppercase text-brand-200/70;
   }
 }
+
+@media print {
+  body,
+  html {
+    background: #fff !important;
+    color: #111 !important;
+  }
+
+  main {
+    max-width: none !important;
+    padding: 1rem !important;
+  }
+
+  .mirror-card,
+  .mirror-card-quiet,
+  .table-surface {
+    background: #fff !important;
+    border-color: #bbb !important;
+    box-shadow: none !important;
+    color: #111 !important;
+  }
+
+  .mirror-card::before,
+  .mirror-card-quiet::before {
+    display: none !important;
+  }
+
+  button,
+  select,
+  input,
+  textarea {
+    display: none !important;
+  }
+
+}

@@ -46,6 +46,29 @@ This project stores real attendee data and Supabase credentials locally only.
 - Environment variables live in `.env` and are not checked into Git.
 - Use synthetic test fixtures only in automated tests.
 
+## Release checklist
+
+1. Apply `supabase/migrations/0001_core_schema.sql`, then `0002_rls_policies.sql`, then `0003_allocation_preferences.sql`.
+2. Create `.env` from `.env.example` and add the Supabase URL and anon key.
+3. Create the first admin with `supabase/seed_first_admin.example.sql`.
+4. Run `npm test` and `npm run build`.
+5. Deploy the Vite output to Vercel and set the same `VITE_SUPABASE_*` variables there.
+
+The app is ready for a GitHub/Vercel connection, but the repository and deployment
+URLs are intentionally environment-specific and are not stored in this project.
+
+### Vercel deployment
+
+Import the repository into Vercel as a Vite project. Use the default build settings:
+
+- Build command: `npm run build`
+- Output directory: `dist`
+- Install command: `npm install`
+
+Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` under Vercel Project Settings →
+Environment Variables for Preview and Production. The included `vercel.json` keeps
+direct navigation to routes such as `/dashboard`, `/checkin`, and `/allocations` working.
+
 ## Repository conventions
 
 - Domain logic is kept in `src/domain/` and should remain deterministic.

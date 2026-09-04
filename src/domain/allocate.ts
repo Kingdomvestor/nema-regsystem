@@ -3,7 +3,11 @@ import type { AttendeeForAllocation, Room, AllocationResult } from './types'
 type Mode = 'mix_states' | 'group_by_state'
 
 function genderAllowed(room: Room, gender: string) {
-  return room.genderDesignation === 'any' || room.genderDesignation === gender
+  return room.genderDesignation === 'any' || room.genderDesignation === gender.toLowerCase()
+}
+
+function roomAllows(room: Room, attendees: AttendeeForAllocation[]) {
+  return attendees.every((attendee) => genderAllowed(room, attendee.gender) && (!attendee.accessibilityRequired || room.accessible))
 }
 
 function privateClassFor(type: string | null): Room['roomClass'] | null {
@@ -37,7 +41,7 @@ export default function allocate(
     if (!room) continue
     const cap = roomCap.get(rid) || 0
     if (cap <= 0) continue
-    if (!genderAllowed(room, a.gender)) continue
+    if (!roomAllows(room, [a])) continue
     results.set(a.regId, rid)
     roomCap.set(rid, cap - 1)
   }
@@ -48,7 +52,7 @@ export default function allocate(
       if (!predicate(r)) continue
       const cap = roomCap.get(r.id) || 0
       if (cap <= 0) continue
-      if (!genderAllowed(r, att.gender)) continue
+      if (!roomAllows(r, [att])) continue
       results.set(att.regId, r.id)
       roomCap.set(r.id, cap - 1)
       return true
@@ -65,7 +69,27 @@ export default function allocate(
     ? [...privateAttendees].sort((x, y) => (x.state || '').localeCompare(y.state || ''))
     : privateAttendees
 
+  const privateGroups = new Map<string, AttendeeForAllocation[]>()
+  for (const attendee of privateOrder) {
+    const key = attendee.togetherGroup?.trim()
+    if (key) privateGroups.set(key, [...(privateGroups.get(key) ?? []), attendee])
+  }
+  const groupedIds = new Set([...privateGroups.values()].flat().map((attendee) => attendee.regId))
+
+  for (const group of privateGroups.values()) {
+    if (group.some((attendee) => results.get(attendee.regId))) continue
+    const desired = privateClassFor(group[0].privateRoomType)
+    if (!desired || group.some((attendee) => privateClassFor(attendee.privateRoomType) !== desired)) continue
+    const room = rooms.find((candidate) => candidate.roomClass === desired && (roomCap.get(candidate.id) ?? 0) >= group.length && roomAllows(candidate, group))
+    if (!room) continue
+    for (const attendee of group) {
+      results.set(attendee.regId, room.id)
+    }
+    roomCap.set(room.id, (roomCap.get(room.id) ?? 0) - group.length)
+  }
+
   for (const p of privateOrder) {
+    if (groupedIds.has(p.regId)) continue
     if (results.get(p.regId)) continue
     const desired = privateClassFor(p.privateRoomType)
     if (!desired) continue

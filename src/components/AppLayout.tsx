@@ -42,7 +42,7 @@ export function AppLayout({
 
   return (
     <div className="app-shell">
-      <header className="sticky top-0 z-30 border-b border-[#304650]/70 bg-black/[0.86] backdrop-blur-2xl">
+      <header className="sticky top-0 z-30 border-b border-[#304650]/70 bg-black/[0.86] backdrop-blur-2xl print:hidden">
         <div className="mx-auto flex min-h-16 max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <div className="flex min-w-0 flex-1 flex-wrap items-center gap-4">
             <div className="flex items-center gap-2.5">
@@ -54,8 +54,14 @@ export function AppLayout({
               </span>
             </div>
             <nav className="flex max-w-full items-center gap-1 overflow-x-auto py-1">
+              <NavLink to="/dashboard" className={tabClass}>
+                Dashboard
+              </NavLink>
               <NavLink to="/attendees" className={tabClass}>
                 Attendees
+              </NavLink>
+              <NavLink to="/checkin" className={tabClass}>
+                Check-in
               </NavLink>
               {isAdmin && (
                 <>

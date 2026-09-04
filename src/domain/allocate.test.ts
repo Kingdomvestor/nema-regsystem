@@ -53,4 +53,31 @@ describe('allocate', () => {
     expect(map.get('X')).toBe('r1')
     expect(map.get('Y')).toBeNull()
   })
+
+  it('matches title-cased imported genders to room designations', () => {
+    const result = allocate(
+      [{ regId: 'TITLE', state: 'Oyo', gender: 'Male', accommodationChoice: 'free_hostel', privateRoomType: null }],
+      [room('male-room', 1, 'male', 'hostel')],
+    )
+    expect(result[0].roomId).toBe('male-room')
+  })
+
+  it('keeps a together-group in one paid private room', () => {
+    const result = allocate(
+      [
+        { regId: 'P1', state: 'Oyo', gender: 'male', accommodationChoice: 'private_paid', privateRoomType: 'fan', togetherGroup: 'COUPLE-1' },
+        { regId: 'P2', state: 'Oyo', gender: 'female', accommodationChoice: 'private_paid', privateRoomType: 'fan', togetherGroup: 'COUPLE-1' },
+      ],
+      [room('private', 2, 'any', 'private_fan')],
+    )
+    expect(result).toEqual([{ attendeeId: 'P1', roomId: 'private' }, { attendeeId: 'P2', roomId: 'private' }])
+  })
+
+  it('does not place an accessibility request in a non-accessible room', () => {
+    const result = allocate(
+      [{ regId: 'A11Y', state: 'Oyo', gender: 'female', accommodationChoice: 'free_hostel', privateRoomType: null, accessibilityRequired: true }],
+      [{ ...room('hostel', 1, 'female', 'hostel'), accessible: false }],
+    )
+    expect(result[0].roomId).toBeNull()
+  })
 })

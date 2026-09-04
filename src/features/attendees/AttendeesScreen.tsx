@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../../auth/useAuth'
 import { AppLayout } from '../../components/AppLayout'
 import { Card, StatCard } from '../../components/ui'
+import { supabase } from '../../lib/supabase'
 import { AttendeeEditPanel } from './AttendeeEditPanel'
 import { deleteAttendee, deleteAttendees, fetchAttendees, setAttendeeArrived, updateAttendee } from './attendeesApi'
 import { type AttendeeFilter, emptyFilter, filterAttendees, rowNeedsReview } from './attendeesFilter'
@@ -283,6 +284,17 @@ export function AttendeesScreen() {
 
   useEffect(() => {
     void load()
+
+    const channel = supabase
+      .channel('attendees-live-updates')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'attendees' }, () => {
+        void load()
+      })
+      .subscribe()
+
+    return () => {
+      void supabase.removeChannel(channel)
+    }
   }, [])
 
   const genders = useMemo(

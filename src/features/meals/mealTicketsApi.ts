@@ -21,9 +21,27 @@ export async function registerTicket(sessionId: string, attendeeId: string): Pro
   if (error) throw new Error(error.message)
 }
 
+export async function registerTickets(sessionId: string, attendeeIds: string[]): Promise<void> {
+  if (attendeeIds.length === 0) return
+  const payload = attendeeIds.map((attendee_id) => ({ session_id: sessionId, attendee_id, registered: true }))
+  const { error } = await supabase.from('meal_tickets').upsert(payload, { onConflict: '(attendee_id, session_id)' })
+  if (error) throw new Error(error.message)
+}
+
 export async function toggleCollected(ticketId: string, collected: boolean): Promise<void> {
   const patch = { collected, collected_at: collected ? new Date().toISOString() : null }
   const { error } = await supabase.from('meal_tickets').update(patch).eq('id', ticketId)
+  if (error) throw new Error(error.message)
+}
+
+export async function toggleRegistered(ticketId: string, registered: boolean): Promise<void> {
+  const patch = registered
+    ? { registered }
+    : { registered, collected: false, collected_at: null }
+  const { error } = await supabase
+    .from('meal_tickets')
+    .update(patch)
+    .eq('id', ticketId)
   if (error) throw new Error(error.message)
 }
 

@@ -1,8 +1,9 @@
 import { type FormEvent, useEffect, useMemo, useState } from 'react'
 import { AppLayout } from '../../components/AppLayout'
 import { Card, StatCard } from '../../components/ui'
-import { fetchTicketsForSession, registerTicket, toggleCollected, deleteTicket, type MealTicketRecord } from './mealTicketsApi'
+import { fetchTicketsForSession, registerTicket, registerTickets, toggleCollected, toggleRegistered, type MealTicketRecord } from './mealTicketsApi'
 import { fetchMealSessions, createMealSession, deleteMealSession, type MealSessionRecord } from './mealsApi'
+import { fetchAttendees } from '../attendees/attendeesApi'
 
 const input = 'futuristic-input h-10 w-full'
 
@@ -12,6 +13,7 @@ export function MealsScreen() {
   const [tickets, setTickets] = useState<MealTicketRecord[]>([])
   const [newSession, setNewSession] = useState({ name: '', day: 1, meal_type: 'lunch', sort_order: 0 })
   const [attendeeRegId, setAttendeeRegId] = useState('')
+  const [bulkBusy, setBulkBusy] = useState(false)
 
   async function reloadSessions() {
     try {
@@ -63,6 +65,21 @@ export function MealsScreen() {
     }
   }
 
+  async function handleBulkRegister() {
+    if (!selected) return
+    setBulkBusy(true)
+    try {
+      const attendees = await fetchAttendees()
+      await registerTickets(selected, attendees.map((attendee) => attendee.id))
+      setTickets(await fetchTicketsForSession(selected))
+    } catch (e: any) {
+      console.error(e)
+      alert(e.message || 'Bulk registration failed')
+    } finally {
+      setBulkBusy(false)
+    }
+  }
+
   async function handleToggle(ticketId: string, current: boolean) {
     try {
       await toggleCollected(ticketId, !current)
@@ -76,9 +93,13 @@ export function MealsScreen() {
     }
   }
 
-  async function handleDeleteTicket(ticketId: string) {
-    if (!confirm('Remove ticket?')) return
-    await deleteTicket(ticketId)
+  async function handleToggleRegistered(ticket: MealTicketRecord) {
+    try {
+      await toggleRegistered(ticket.id, !ticket.registered)
+    } catch (e: any) {
+      console.error(e)
+      alert(e.message || 'Could not update registration')
+    }
     if (selected) {
       const t = await fetchTicketsForSession(selected)
       setTickets(t)
@@ -107,7 +128,7 @@ export function MealsScreen() {
   )
 
   return (
-    <AppLayout title="Meal Sessions" subtitle="Create meal sessions, register tickets, and track collection.">
+    <AppLayout title="Meal Sessions" subtitle="Create meal sessions, register tickets, and track collection." actions={<button className="secondary-action" onClick={() => window.print()}>Print meal manifest</button>}>
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <StatCard label="Sessions" value={stats.sessions} tone="brand" />
@@ -214,6 +235,9 @@ export function MealsScreen() {
                   <button className="success-action" onClick={() => void handleRegister()}>
                     Register
                   </button>
+                  <button className="secondary-action" disabled={bulkBusy} onClick={() => void handleBulkRegister()}>
+                    {bulkBusy ? 'Registering...' : 'Register all attendees'}
+                  </button>
                 </div>
                 <div className="space-y-2">
                   {tickets.map((t) => (
@@ -229,8 +253,8 @@ export function MealsScreen() {
                         <button className="secondary-action px-2.5 py-1" onClick={() => void handleToggle(t.id, t.collected)}>
                           {t.collected ? 'Uncollect' : 'Collect'}
                         </button>
-                        <button className="danger-action px-2.5 py-1" onClick={() => void handleDeleteTicket(t.id)}>
-                          Delete
+                        <button className="danger-action px-2.5 py-1" onClick={() => void handleToggleRegistered(t)}>
+                          {t.registered ? 'Opt out' : 'Restore'}
                         </button>
                       </div>
                     </div>

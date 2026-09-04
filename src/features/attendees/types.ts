@@ -19,6 +19,8 @@ export interface AttendeeRecord {
   occupation: string
   gender: string
   marital_status: string
+  together_group?: string | null
+  accessibility_required?: boolean
   first_time: boolean
   heard_via: string
   accommodation_choice: AccommodationChoice | null
@@ -46,6 +48,8 @@ export type EditablePatch = Partial<
     | 'occupation'
     | 'gender'
     | 'marital_status'
+    | 'together_group'
+    | 'accessibility_required'
     | 'first_time'
     | 'heard_via'
     | 'accommodation_choice'

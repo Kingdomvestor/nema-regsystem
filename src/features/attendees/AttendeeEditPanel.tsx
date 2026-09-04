@@ -19,6 +19,8 @@ interface FormState {
   occupation: string
   gender: string
   marital_status: string
+  together_group: string
+  accessibility_required: boolean
   first_time: boolean
   heard_via: string
   accommodation_choice: AccommodationChoice | null
@@ -38,6 +40,8 @@ function seed(r: AttendeeRecord): FormState {
     occupation: r.occupation,
     gender: r.gender,
     marital_status: r.marital_status,
+    together_group: r.together_group ?? '',
+    accessibility_required: r.accessibility_required ?? false,
     first_time: r.first_time,
     heard_via: r.heard_via,
     accommodation_choice: r.accommodation_choice,
@@ -89,7 +93,13 @@ export function AttendeeEditPanel({
   const [form, setForm] = useState<FormState>(() => seed(record))
   const set = (patch: Partial<FormState>) => setForm((f) => ({ ...f, ...patch }))
   const applyResolve = (patch: EditablePatch) =>
-    setForm((f) => ({ ...f, ...patch, notes: patch.notes ?? f.notes }))
+    setForm((f) => ({
+      ...f,
+      ...patch,
+      together_group: patch.together_group ?? f.together_group,
+      accessibility_required: patch.accessibility_required ?? f.accessibility_required,
+      notes: patch.notes ?? f.notes,
+    }))
   const flags = form.review_flags
 
   function save() {
@@ -102,6 +112,8 @@ export function AttendeeEditPanel({
       occupation: form.occupation,
       gender: form.gender,
       marital_status: form.marital_status,
+      together_group: form.together_group.trim() === '' ? null : form.together_group.trim(),
+      accessibility_required: form.accessibility_required,
       first_time: form.first_time,
       heard_via: form.heard_via,
       accommodation_choice: form.accommodation_choice,
@@ -182,6 +194,23 @@ export function AttendeeEditPanel({
                 onChange={(e) => set({ marital_status: e.target.value })}
               />
             </Field>
+            <Field label="Stay-together group">
+              <input
+                className={input}
+                value={form.together_group}
+                onChange={(e) => set({ together_group: e.target.value })}
+                placeholder="Example: COUPLE-001"
+              />
+            </Field>
+            <label className="flex items-center gap-2 text-sm text-zinc-300">
+              <input
+                type="checkbox"
+                checked={form.accessibility_required}
+                onChange={(e) => set({ accessibility_required: e.target.checked })}
+                className="accent-brand-300"
+              />
+              Requires accessible room
+            </label>
             <Field label="Occupation">
               <input className={input} value={form.occupation} onChange={(e) => set({ occupation: e.target.value })} />
             </Field>
