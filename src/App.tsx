@@ -32,7 +32,7 @@ export default function App() {
       <Route
         path="/attendees"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requireDesk>
             <AttendeesScreen />
           </ProtectedRoute>
         }
@@ -40,7 +40,7 @@ export default function App() {
       <Route
         path="/checkin"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requireDesk>
             <CheckinScreen />
           </ProtectedRoute>
         }

@@ -31,6 +31,7 @@ export function AppLayout({
   const { session, staff } = useAuth()
   const isAdmin = staff?.role === 'admin'
   const canManageAccommodation = isAdmin || staff?.role === 'accommodation'
+  const canUseDeskScreens = isAdmin || staff?.role === 'desk'
   const [displayMode, setDisplayMode] = useState<DisplayMode>('black')
 
   useEffect(() => {
@@ -95,12 +96,8 @@ export function AppLayout({
             <NavLink to="/dashboard" className={tabClass}>
               Dashboard
             </NavLink>
-            <NavLink to="/attendees" className={tabClass}>
-              Attendees
-            </NavLink>
-            <NavLink to="/checkin" className={tabClass}>
-              Check-in
-            </NavLink>
+            {canUseDeskScreens && <NavLink to="/attendees" className={tabClass}>Attendees</NavLink>}
+            {canUseDeskScreens && <NavLink to="/checkin" className={tabClass}>Check-in</NavLink>}
             {canManageAccommodation && (
               <>
                 {isAdmin && <NavLink to="/import" className={tabClass}>Import</NavLink>}
