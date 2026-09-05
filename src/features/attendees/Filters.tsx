@@ -83,17 +83,6 @@ export function Filters({
         <option value="none">No choice</option>
       </select>
 
-      <select
-        value={value.arrived}
-        onChange={(e) => set({ arrived: e.target.value as AttendeeFilter['arrived'] })}
-        className={control}
-        aria-label="Filter by arrival status"
-      >
-        <option value="all">Any arrival</option>
-        <option value="yes">Arrived</option>
-        <option value="no">Not arrived</option>
-      </select>
-
       <label
         className={
           'flex h-10 cursor-pointer items-center justify-center gap-2 rounded-lg border px-3 text-sm font-semibold shadow-sm transition duration-200 focus-within:ring-2 focus-within:ring-amber-300/45 ' +

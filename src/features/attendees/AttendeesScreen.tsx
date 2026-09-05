@@ -7,7 +7,7 @@ import { AppLayout } from '../../components/AppLayout'
 import { Card, StatCard } from '../../components/ui'
 import { supabase } from '../../lib/supabase'
 import { AttendeeEditPanel } from './AttendeeEditPanel'
-import { deleteAttendee, deleteAttendees, fetchAttendees, setAttendeeArrived, updateAttendee } from './attendeesApi'
+import { deleteAttendee, deleteAttendees, fetchAttendees, updateAttendee } from './attendeesApi'
 import { type AttendeeFilter, emptyFilter, filterAttendees, rowNeedsReview } from './attendeesFilter'
 import { AttendeesTable } from './AttendeesTable'
 import { Filters } from './Filters'
@@ -41,15 +41,6 @@ function CopyIcon() {
     <svg className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
       <rect x="8" y="8" width="11" height="11" rx="2" />
       <path d="M5 15H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1" />
-    </svg>
-  )
-}
-
-function CheckCircleIcon() {
-  return (
-    <svg className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-      <path d="M21 11.1V12a9 9 0 1 1-5.35-8.23" />
-      <path d="m9 11 3 3L22 4" />
     </svg>
   )
 }
@@ -94,7 +85,7 @@ function csvCell(value: unknown) {
 }
 
 function exportRows(rows: AttendeeRecord[]) {
-  const header = ['RegID', 'Name', 'State', 'Gender', 'Accommodation', 'Arrived', 'Flags']
+  const header = ['RegID', 'Name', 'State', 'Gender', 'Accommodation', 'Flags']
   const lines = rows.map((row) => {
     const flags = [
       row.review_flags.location ? 'location' : '',
@@ -110,7 +101,6 @@ function exportRows(rows: AttendeeRecord[]) {
       row.state ?? row.location_raw,
       row.gender,
       row.accommodation_choice ?? '',
-      row.arrived ? 'yes' : 'no',
       flags,
     ]
       .map(csvCell)
@@ -263,7 +253,6 @@ export function AttendeesScreen() {
   const [filter, setFilter] = useState<AttendeeFilter>(emptyFilter)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [selectedDuplicateIds, setSelectedDuplicateIds] = useState<Set<string>>(new Set())
-  const [arrivalBusyId, setArrivalBusyId] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [panelError, setPanelError] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
@@ -320,7 +309,6 @@ export function AttendeesScreen() {
       total: records.length,
       review: records.filter(rowNeedsReview).length,
       duplicates: records.filter((r) => r.review_flags.duplicate || r.dupe_flag).length,
-      arrived: records.filter((r) => r.arrived).length,
     }),
     [records],
   )
@@ -399,22 +387,6 @@ export function AttendeesScreen() {
     }
   }
 
-  async function onToggleArrived(row: AttendeeRecord) {
-    const arrived = !row.arrived
-    setArrivalBusyId(row.id)
-    setLoadError(null)
-    try {
-      await setAttendeeArrived(row.id, arrived)
-      setRecords((current) =>
-        current.map((record) => (record.id === row.id ? { ...record, arrived } : record)),
-      )
-    } catch (e) {
-      setLoadError(e instanceof Error ? e.message : String(e))
-    } finally {
-      setArrivalBusyId(null)
-    }
-  }
-
   return (
     <AppLayout
       title="Attendees"
@@ -464,13 +436,6 @@ export function AttendeesScreen() {
             tone={stats.duplicates > 0 ? 'red' : 'default'}
             description="Possible duplicates"
             icon={<CopyIcon />}
-          />
-          <StatCard
-            label="Arrived"
-            value={stats.arrived}
-            tone={stats.arrived > 0 ? 'success' : 'default'}
-            description="Checked in attendees"
-            icon={<CheckCircleIcon />}
           />
         </div>
 
@@ -524,10 +489,8 @@ export function AttendeesScreen() {
               selectedId={selectedId}
               selectedIds={selectedDuplicateIds}
               canSelectRow={(row) => isAdmin && (row.review_flags.duplicate || row.dupe_flag)}
-              arrivalBusyId={arrivalBusyId}
               onSelect={setSelectedId}
               onToggleSelect={toggleDuplicateSelection}
-              onToggleArrived={onToggleArrived}
             />
             <PaginationControls
               currentPage={safeCurrentPage}

@@ -25,15 +25,6 @@ function Badge({ label, color }: { label: string; color: string }) {
   )
 }
 
-function CheckCircleIcon() {
-  return (
-    <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-      <path d="M21 11.1V12a9 9 0 1 1-5.35-8.23" />
-      <path d="m9 11 3 3L22 4" />
-    </svg>
-  )
-}
-
 function ChevronRightIcon() {
   return (
     <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" aria-hidden="true">
@@ -47,40 +38,33 @@ export function AttendeesTable({
   selectedId,
   selectedIds = new Set<string>(),
   canSelectRow = () => false,
-  arrivalBusyId = null,
   onSelect,
   onToggleSelect,
-  onToggleArrived,
 }: {
   rows: AttendeeRecord[]
   selectedId: string | null
   selectedIds?: Set<string>
   canSelectRow?: (row: AttendeeRecord) => boolean
-  arrivalBusyId?: string | null
   onSelect: (id: string) => void
   onToggleSelect?: (id: string, checked: boolean) => void
-  onToggleArrived?: (row: AttendeeRecord) => void
 }) {
   return (
     <div id="attendees-table" className="max-h-[calc(100vh-22rem)] overflow-auto">
       <table className="w-full min-w-[52rem] table-fixed border-collapse text-sm sm:min-w-[70rem]">
         <colgroup>
           <col className="w-10 sm:w-12" />
-          <col className="w-26 sm:w-32" />
           <col className="w-[15rem] sm:w-[20rem]" />
           <col className="w-28 sm:w-36" />
           <col className="w-22 sm:w-24" />
           <col className="w-32 sm:w-44" />
           <col className="w-30 sm:w-40" />
           <col className="w-28 sm:w-40" />
-          <col className="w-10 sm:w-12" />
         </colgroup>
         <thead className="sticky top-0 z-10 bg-[#0D151B]/92 text-left text-[11px] font-semibold uppercase text-[#A7B1BA] backdrop-blur-xl">
           <tr className="border-b border-[#26343C]/90">
             <th className="px-3 py-3 sm:px-4" aria-label="Select duplicates">
               <span className="block h-4 w-4 rounded border border-white/30 bg-white/[0.04]" aria-hidden="true" />
             </th>
-            <th className="px-3 py-3 text-center sm:px-4">Arrived</th>
             <th className="px-3 py-3 sm:px-4">Name</th>
             <th className="px-3 py-3 sm:px-4">State</th>
             <th className="px-3 py-3 sm:px-4">Gender</th>
@@ -123,26 +107,6 @@ export function AttendeesTable({
                     ) : (
                       <span className="block h-4 w-4" />
                     )}
-                  </td>
-                  <td className="px-3 py-3 text-center sm:px-4">
-                    <button
-                      type="button"
-                      disabled={arrivalBusyId === r.id}
-                      className={
-                        'inline-flex min-w-20 items-center justify-center gap-1 rounded-full border px-2 py-1 text-[10px] font-semibold transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300/45 disabled:cursor-wait disabled:opacity-60 sm:min-w-24 sm:gap-1.5 sm:px-2.5 sm:text-xs ' +
-                        (r.arrived
-                          ? 'border-emerald-300/35 bg-emerald-300/12 text-emerald-100 hover:bg-emerald-300/18'
-                          : 'border-brand-300/28 bg-brand-300/6 text-brand-100 hover:border-brand-300/45 hover:bg-brand-300/12')
-                      }
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        onToggleArrived?.(r)
-                      }}
-                      aria-label={r.arrived ? `Mark ${r.full_name} not arrived` : `Mark ${r.full_name} arrived`}
-                    >
-                      <CheckCircleIcon />
-                      {arrivalBusyId === r.id ? 'Saving' : r.arrived ? 'Arrived' : 'Mark'}
-                    </button>
                   </td>
                   <td className="min-w-0 px-3 py-3 sm:px-4">
                     <div className="flex min-w-0 max-w-full items-center gap-2">
@@ -192,7 +156,7 @@ export function AttendeesTable({
             })}
             {rows.length === 0 && (
               <tr>
-                <td colSpan={9} className="px-4 py-12 text-center text-zinc-400">
+                <td colSpan={8} className="px-4 py-12 text-center text-zinc-400">
                   No attendees match these filters.
                 </td>
               </tr>
