@@ -22,12 +22,14 @@ revoke all on function public.is_accommodation_staff() from public;
 grant execute on function public.is_accommodation_staff() to authenticated;
 
 drop policy if exists rooms_admin_write on public.rooms;
+drop policy if exists rooms_accommodation_write on public.rooms;
 create policy rooms_accommodation_write on public.rooms
   for all to authenticated
   using (public.is_accommodation_staff())
   with check (public.is_accommodation_staff());
 
 drop policy if exists allocations_admin_write on public.allocations;
+drop policy if exists allocations_accommodation_write on public.allocations;
 create policy allocations_accommodation_write on public.allocations
   for all to authenticated
   using (public.is_accommodation_staff())
