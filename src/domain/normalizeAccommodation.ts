@@ -11,8 +11,8 @@ import type {
  *   else unknown (null).
  * - `privateRoomType`: "fan" → fan, else an "ac" substring or a stray 'a' + 'c'
  *   (e.g. "a/c", "air conditioned") → ac, else null.
- * - A room type paired with anything other than private_paid is a `conflict`.
- * - `needsReview` when there is a conflict or the choice could not be recognized.
+ * - Room type is relevant only for private_paid; hostel selections ignore it.
+ * - `needsReview` when the choice is unknown or a private room type is missing.
  */
 export function normalizeAccommodation(
   accommodationOptions: string,
@@ -31,8 +31,9 @@ export function normalizeAccommodation(
     roomType = 'ac'
   }
 
-  const conflict = roomType !== null && choice !== 'private_paid'
-  const needsReview = conflict || choice === null
+  const relevantRoomType = choice === 'private_paid' ? roomType : null
+  const conflict = false
+  const needsReview = choice === null || (choice === 'private_paid' && relevantRoomType === null)
 
-  return { choice, roomType, conflict, needsReview }
+  return { choice, roomType: relevantRoomType, conflict, needsReview }
 }

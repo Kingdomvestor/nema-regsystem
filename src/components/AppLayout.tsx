@@ -19,15 +19,18 @@ export function AppLayout({
   title,
   subtitle,
   actions,
+  actionsAtTop = false,
   children,
 }: {
   title: string
   subtitle?: ReactNode
   actions?: ReactNode
+  actionsAtTop?: boolean
   children: ReactNode
 }) {
   const { session, staff } = useAuth()
   const isAdmin = staff?.role === 'admin'
+  const canManageAccommodation = isAdmin || staff?.role === 'accommodation'
   const [displayMode, setDisplayMode] = useState<DisplayMode>('black')
 
   useEffect(() => {
@@ -98,20 +101,16 @@ export function AppLayout({
             <NavLink to="/checkin" className={tabClass}>
               Check-in
             </NavLink>
-            {isAdmin && (
+            {canManageAccommodation && (
               <>
-                <NavLink to="/import" className={tabClass}>
-                  Import
-                </NavLink>
+                {isAdmin && <NavLink to="/import" className={tabClass}>Import</NavLink>}
                 <NavLink to="/rooms" className={tabClass}>
                   Rooms
                 </NavLink>
                 <NavLink to="/allocations" className={tabClass}>
                   Allocations
                 </NavLink>
-                <NavLink to="/meals" className={tabClass}>
-                  Meals
-                </NavLink>
+                {isAdmin && <NavLink to="/meals" className={tabClass}>Meals</NavLink>}
               </>
             )}
           </nav>
@@ -119,15 +118,15 @@ export function AppLayout({
       </header>
 
       <main className="mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-6">
-        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
+        <div className={actionsAtTop ? 'mb-6 flex items-start justify-between gap-3' : 'mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between'}>
+          <div className={actionsAtTop ? 'min-w-0' : undefined}>
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-200/70 sm:text-xs">
               Live Operations
             </p>
             <h1 className="mt-1 text-2xl font-semibold text-[#F3F7FA] sm:text-3xl">{title}</h1>
             {subtitle && <p className="mt-1 max-w-3xl text-sm text-[#A7B1BA]">{subtitle}</p>}
           </div>
-          {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+          {actions && <div className={actionsAtTop ? 'flex shrink-0 flex-wrap items-center justify-end gap-2' : 'flex flex-wrap items-center gap-2'}>{actions}</div>}
         </div>
         {children}
       </main>

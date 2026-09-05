@@ -56,7 +56,7 @@ export function runImport(rows: RawRow[]): ImportResult {
       dupe !== undefined && (dupe.byName || dupe.byPhone || dupe.byEmail)
 
     const reviewFlags = {
-      location: location.needsReview,
+      location: false,
       accommodation: accommodation.needsReview,
       duplicate,
     }
@@ -83,7 +83,7 @@ export function runImport(rows: RawRow[]): ImportResult {
     const stateKey = location.state ?? UNKNOWN_STATE
     byState[stateKey] = (byState[stateKey] ?? 0) + 1
     byGender[row.gender] = (byGender[row.gender] ?? 0) + 1
-    if (reviewFlags.location || reviewFlags.accommodation || duplicate) {
+    if (reviewFlags.accommodation || duplicate) {
       needingReview++
     }
     if (duplicate) duplicates++

@@ -14,9 +14,11 @@ function Centered({ children }: { children: ReactNode }) {
 
 export function ProtectedRoute({
   requireAdmin = false,
+  requireAccommodation = false,
   children,
 }: {
   requireAdmin?: boolean
+  requireAccommodation?: boolean
   children: ReactNode
 }) {
   const { session, staff, loading } = useAuth()
@@ -50,6 +52,15 @@ export function ProtectedRoute({
       <Centered>
         <h1 className="text-lg font-semibold text-zinc-50">Admin access required</h1>
         <p className="text-sm text-zinc-400">Ask an admin to run this workflow.</p>
+      </Centered>
+    )
+  }
+
+  if (requireAccommodation && staff.role !== 'admin' && staff.role !== 'accommodation') {
+    return (
+      <Centered>
+        <h1 className="text-lg font-semibold text-zinc-50">Accommodation access required</h1>
+        <p className="text-sm text-zinc-400">Ask an admin to add accommodation access to your account.</p>
       </Centered>
     )
   }

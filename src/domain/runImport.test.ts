@@ -46,37 +46,37 @@ describe('runImport', () => {
     })
   })
 
-  it('flags an unmappable location and buckets it under Unknown', () => {
+  it('keeps an unmappable location without flagging it for review', () => {
     const { attendees, stats } = runImport([rawRow({ location: 'Abuja' })])
     const a = attendees[0]!
     expect(a.state).toBeNull()
     expect(a.locationRaw).toBe('Abuja')
-    expect(a.reviewFlags.location).toBe(true)
+    expect(a.reviewFlags.location).toBe(false)
     expect(stats.byState).toEqual({ Unknown: 1 })
-    expect(stats.needingReview).toBe(1)
+    expect(stats.needingReview).toBe(0)
   })
 
-  it('flags an accommodation contradiction (room type without private paid)', () => {
+  it('does not flag a room type on a free-hostel selection', () => {
     const { attendees, stats } = runImport([
       rawRow({ accommodationOptions: 'Free hostel', privateRoomType: 'Fan' }),
     ])
     const a = attendees[0]!
     expect(a.accommodationChoice).toBe('free_hostel')
-    expect(a.privateRoomType).toBe('fan')
-    expect(a.reviewFlags.accommodation).toBe(true)
-    expect(stats.accommodationConflicts).toBe(1)
-    expect(stats.needingReview).toBe(1)
+    expect(a.privateRoomType).toBeNull()
+    expect(a.reviewFlags.accommodation).toBe(false)
+    expect(stats.accommodationConflicts).toBe(0)
+    expect(stats.needingReview).toBe(0)
   })
 
-  it('flags a duplicate pair that shares a phone number', () => {
+  it('does not flag a duplicate pair that only shares a phone number', () => {
     const { attendees, stats } = runImport([
       rawRow({ fullName: 'Ada', email: 'a@x.com', whatsapp: '0900' }),
       rawRow({ fullName: 'Bea', email: 'b@x.com', whatsapp: '0900' }),
     ])
-    expect(attendees[0]!.reviewFlags.duplicate).toBe(true)
-    expect(attendees[1]!.reviewFlags.duplicate).toBe(true)
-    expect(stats.duplicates).toBe(2)
-    expect(stats.needingReview).toBe(2)
+    expect(attendees[0]!.reviewFlags.duplicate).toBe(false)
+    expect(attendees[1]!.reviewFlags.duplicate).toBe(false)
+    expect(stats.duplicates).toBe(0)
+    expect(stats.needingReview).toBe(0)
   })
 
   it('parses firstTime via /^y/i', () => {

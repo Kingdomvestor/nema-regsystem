@@ -40,29 +40,29 @@ describe('normalizeAccommodation', () => {
     expect(normalizeAccommodation('Private', 'A/C')).toMatchObject({ roomType: 'ac' })
   })
 
-  it('allows a private choice with no room type without flagging', () => {
+  it('requires a room type for a private choice', () => {
     expect(normalizeAccommodation('Private', '')).toEqual({
       choice: 'private_paid',
+      roomType: null,
+      conflict: false,
+      needsReview: true,
+    })
+  })
+
+  it('ignores a room type when the choice is free_hostel', () => {
+    expect(normalizeAccommodation('Hostel', 'Fan')).toEqual({
+      choice: 'free_hostel',
       roomType: null,
       conflict: false,
       needsReview: false,
     })
   })
 
-  it('flags a conflict when a room type is set but the choice is free_hostel', () => {
-    expect(normalizeAccommodation('Hostel', 'Fan')).toEqual({
-      choice: 'free_hostel',
-      roomType: 'fan',
-      conflict: true,
-      needsReview: true,
-    })
-  })
-
-  it('flags a conflict when a room type is set but no choice is recognized', () => {
+  it('flags an unrecognized choice even when a room type is set', () => {
     expect(normalizeAccommodation('', 'AC')).toEqual({
       choice: null,
-      roomType: 'ac',
-      conflict: true,
+      roomType: null,
+      conflict: false,
       needsReview: true,
     })
   })

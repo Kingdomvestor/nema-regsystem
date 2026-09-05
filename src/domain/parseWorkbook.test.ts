@@ -91,6 +91,31 @@ describe('parseWorkbook', () => {
     expect(row.whatsapp).toBe('8030000')
   })
 
+  it('finds accommodation columns by header when extra columns shift their position', () => {
+    const bytes = workbookBytes([
+      [...HEADER.slice(0, 11), 'Extra column', HEADER[11], HEADER[12]],
+      ['2026', 'Ada', '0801', 'ada@x.com', '', 'Lagos', '', 'Female', '', 'No', '', 'ignored', 'Free hostel', ''],
+    ])
+    const rows = parseWorkbook(bytes)
+    expect(rows[0]?.accommodationOptions).toBe('Free hostel')
+    expect(rows[0]?.privateRoomType).toBe('')
+  })
+
+  it('maps all fields when the timestamp column is absent', () => {
+    const headers = HEADER.slice(1)
+    const bytes = workbookBytes([
+      headers,
+      ['Ada Lovelace', '0801', 'ada@x.com', '25-34', 'Lagos', 'Engineer', 'Female', 'Single', 'No', 'Friend', 'Free hostel', ''],
+    ])
+    const row = parseWorkbook(bytes)[0]
+    expect(row?.fullName).toBe('Ada Lovelace')
+    expect(row?.whatsapp).toBe('0801')
+    expect(row?.location).toBe('Lagos')
+    expect(row?.occupation).toBe('Engineer')
+    expect(row?.gender).toBe('Female')
+    expect(row?.accommodationOptions).toBe('Free hostel')
+  })
+
   it('returns an empty array for a header-only sheet', () => {
     expect(parseWorkbook(workbookBytes([HEADER]))).toEqual([])
   })

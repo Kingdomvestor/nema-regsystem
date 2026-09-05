@@ -12,6 +12,7 @@ Run these **once, in order**, against the project:
 1. `migrations/0001_core_schema.sql` — tables, constraints, indexes.
 2. `migrations/0002_rls_policies.sql` — role helpers + Row-Level Security.
 3. `migrations/0003_allocation_preferences.sql` — together-group and accessible-room preferences.
+4. `migrations/0004_accommodation_staff_role.sql` — accommodation role and room/allocation permissions.
 
 Then do the one-time **first-admin bootstrap** (see below) so you can log in
 with a staff role.
@@ -40,7 +41,9 @@ that bypasses RLS:
    — you should see your email with role `admin`.
 
 Add further staff later either in the SQL editor or (once built) the app's
-staff screen while logged in as an admin.
+staff screen while logged in as an admin. Use `desk` for check-in staff and
+`accommodation` for staff who manage rooms and allocations. Admins retain all
+permissions.
 
 ## Verify the migrations
 

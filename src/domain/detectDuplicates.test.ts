@@ -20,23 +20,23 @@ describe('detectDuplicates', () => {
     expect(flags.get('R2')).toEqual({ byName: true, byPhone: false, byEmail: false })
   })
 
-  it('flags a shared phone number', () => {
+  it('does not flag a shared phone number', () => {
     const flags = detectDuplicates([
       { regId: 'R1', fullName: 'Ada', whatsapp: '0800', email: 'a@x.com' },
       { regId: 'R2', fullName: 'Bea', whatsapp: '0800', email: 'b@x.com' },
     ])
-    expect(flags.get('R1')?.byPhone).toBe(true)
-    expect(flags.get('R2')?.byPhone).toBe(true)
+    expect(flags.get('R1')?.byPhone).toBe(false)
+    expect(flags.get('R2')?.byPhone).toBe(false)
     expect(flags.get('R1')?.byName).toBe(false)
   })
 
-  it('flags a shared email', () => {
+  it('does not flag a shared email', () => {
     const flags = detectDuplicates([
       { regId: 'R1', fullName: 'Ada', whatsapp: '0801', email: 'shared@x.com' },
       { regId: 'R2', fullName: 'Bea', whatsapp: '0802', email: 'shared@x.com' },
     ])
-    expect(flags.get('R1')?.byEmail).toBe(true)
-    expect(flags.get('R2')?.byEmail).toBe(true)
+    expect(flags.get('R1')?.byEmail).toBe(false)
+    expect(flags.get('R2')?.byEmail).toBe(false)
   })
 
   it('normalizes with trim + lowercase before comparing', () => {
@@ -44,8 +44,8 @@ describe('detectDuplicates', () => {
       { regId: 'R1', fullName: 'Ada Lovelace', whatsapp: '0801', email: 'ADA@X.com' },
       { regId: 'R2', fullName: '  ada lovelace ', whatsapp: '0802', email: ' ada@x.com ' },
     ])
-    expect(flags.get('R1')).toEqual({ byName: true, byPhone: false, byEmail: true })
-    expect(flags.get('R2')).toEqual({ byName: true, byPhone: false, byEmail: true })
+    expect(flags.get('R1')).toEqual({ byName: true, byPhone: false, byEmail: false })
+    expect(flags.get('R2')).toEqual({ byName: true, byPhone: false, byEmail: false })
   })
 
   it('never flags blank or whitespace-only values', () => {

@@ -419,6 +419,7 @@ export function AttendeesScreen() {
     <AppLayout
       title="Attendees"
       subtitle="Search, review, and edit registrations."
+      actionsAtTop
       actions={
         <button
           type="button"

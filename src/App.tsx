@@ -48,7 +48,7 @@ export default function App() {
       <Route
         path="/rooms"
         element={
-          <ProtectedRoute requireAdmin>
+          <ProtectedRoute requireAccommodation>
             <RoomsScreen />
           </ProtectedRoute>
         }
@@ -56,7 +56,7 @@ export default function App() {
       <Route
         path="/allocations"
         element={
-          <ProtectedRoute requireAdmin>
+          <ProtectedRoute requireAccommodation>
             <AllocationScreen />
           </ProtectedRoute>
         }
