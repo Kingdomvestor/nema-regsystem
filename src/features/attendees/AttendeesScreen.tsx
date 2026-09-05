@@ -45,6 +45,15 @@ function CopyIcon() {
   )
 }
 
+function CheckCircleIcon() {
+  return (
+    <svg className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+      <path d="M21 11.1V12a9 9 0 1 1-5.35-8.23" />
+      <path d="m9 11 3 3L22 4" />
+    </svg>
+  )
+}
+
 function DownloadIcon() {
   return (
     <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
@@ -309,6 +318,7 @@ export function AttendeesScreen() {
       total: records.length,
       review: records.filter(rowNeedsReview).length,
       duplicates: records.filter((r) => r.review_flags.duplicate || r.dupe_flag).length,
+      arrived: records.filter((r) => r.arrived).length,
     }),
     [records],
   )
@@ -436,6 +446,13 @@ export function AttendeesScreen() {
             tone={stats.duplicates > 0 ? 'red' : 'default'}
             description="Possible duplicates"
             icon={<CopyIcon />}
+          />
+          <StatCard
+            label="Arrived"
+            value={stats.arrived}
+            tone={stats.arrived > 0 ? 'success' : 'default'}
+            description="Checked in attendees"
+            icon={<CheckCircleIcon />}
           />
         </div>
 
