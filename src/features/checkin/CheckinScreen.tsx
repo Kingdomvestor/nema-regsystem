@@ -83,30 +83,63 @@ export default function CheckinScreen() {
   return (
     <AppLayout title="Check-in desk" subtitle="Search by name, phone, email, or registration ID and mark arrival.">
       <div className="mx-auto max-w-7xl space-y-4">
-        <Card className="p-4 sm:p-6">
+        <Card className="p-3 sm:p-6">
           <label className="block">
             <span className="field-label">Find attendee</span>
-            <input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Name, phone, email, or RegID" className="futuristic-input h-14 w-full text-lg" />
+            <input
+              autoFocus
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Name, phone, email, or RegID"
+              className="futuristic-input mt-1 h-12 w-full text-base sm:h-14 sm:text-lg"
+            />
           </label>
         </Card>
-        {offline && <div className="rounded-md border border-amber-300/30 bg-amber-300/10 p-3 text-sm text-amber-100">Offline mode: check-ins are queued and will sync automatically when the connection returns.</div>}
-        {error && <div className="rounded-lg border border-red-300/30 bg-red-400/10 p-3 text-sm text-red-200">{error} <button className="ml-2 underline" onClick={() => void load()}>Retry</button></div>}
+
+        {offline && (
+          <div className="rounded-md border border-amber-300/30 bg-amber-300/10 p-3 text-sm text-amber-100">
+            Offline mode: check-ins are queued and will sync automatically when the connection returns.
+          </div>
+        )}
+
+        {error && (
+          <div className="rounded-lg border border-red-300/30 bg-red-400/10 p-3 text-sm text-red-200">
+            {error}{' '}
+            <button className="ml-2 underline" onClick={() => void load()}>
+              Retry
+            </button>
+          </div>
+        )}
+
         {loading && <Card className="p-8 text-center text-zinc-400">Loading attendees...</Card>}
         {!loading && results.length === 0 && <Card className="p-8 text-center text-zinc-400">No matching attendee.</Card>}
+
         <div className="grid gap-3 sm:grid-cols-2">
           {results.map((attendee) => {
             const room = roomById.get(allocationByAttendee.get(attendee.id) ?? '')
-            return <Card key={attendee.id} className="flex flex-col justify-between gap-4 rounded-md p-4 sm:flex-row sm:items-center sm:p-5">
-              <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-5 gap-y-2">
-                <p className="truncate text-lg font-semibold text-zinc-50">{attendee.full_name}</p>
-                <p className="font-mono text-xs text-zinc-400">{attendee.id}</p>
-                <p className="text-sm text-zinc-300">{attendee.whatsapp || attendee.email || 'No contact listed'}</p>
-                <p className="text-sm text-zinc-400">{room ? `Room ${room.block} ${room.room_number}` : 'No room allocated'}</p>
-              </div>
-              <button type="button" disabled={busyId === attendee.id} onClick={() => void toggleArrival(attendee)} className={attendee.arrived ? 'secondary-action min-h-12 w-full sm:w-auto sm:min-w-32' : 'success-action min-h-12 w-full sm:w-auto sm:min-w-32'}>
-                {busyId === attendee.id ? 'Saving...' : attendee.arrived ? 'Arrived' : 'Mark arrived'}
-              </button>
-            </Card>
+            return (
+              <Card key={attendee.id} className="flex flex-col justify-between gap-4 rounded-md p-4 sm:flex-row sm:items-center sm:p-5">
+                <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-wrap sm:flex-row sm:items-center sm:gap-x-5 sm:gap-y-2">
+                  <p className="truncate text-lg font-semibold text-zinc-50">{attendee.full_name}</p>
+                  <p className="font-mono text-[10px] text-zinc-400 sm:text-xs">{attendee.id}</p>
+                  <p className="text-sm text-zinc-300">{attendee.whatsapp || attendee.email || 'No contact listed'}</p>
+                  <p className="text-sm text-zinc-400">{room ? `Room ${room.block} ${room.room_number}` : 'No room allocated'}</p>
+                </div>
+
+                <button
+                  type="button"
+                  disabled={busyId === attendee.id}
+                  onClick={() => void toggleArrival(attendee)}
+                  className={
+                    attendee.arrived
+                      ? 'secondary-action min-h-12 w-full sm:w-auto sm:min-w-32'
+                      : 'success-action min-h-12 w-full sm:w-auto sm:min-w-32'
+                  }
+                >
+                  {busyId === attendee.id ? 'Saving...' : attendee.arrived ? 'Arrived' : 'Mark arrived'}
+                </button>
+              </Card>
+            )
           })}
         </div>
       </div>

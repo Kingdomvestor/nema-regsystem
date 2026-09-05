@@ -23,14 +23,14 @@ export function LoginScreen() {
   }
 
   return (
-    <main className="app-shell flex items-center justify-center px-4 py-10">
-      <form onSubmit={onSubmit} className="mirror-card w-full max-w-sm space-y-5 p-6">
+    <main className="app-shell flex min-h-screen items-center justify-center px-4 py-8 sm:px-6">
+      <form onSubmit={onSubmit} className="mirror-card w-full max-w-sm space-y-5 p-5 sm:p-6">
         <div className="space-y-3">
-          <span className="grid h-10 w-10 place-items-center rounded-lg border border-white/40 bg-brand-300/15 text-sm font-bold text-brand-100 shadow-[0_0_28px_rgba(0,229,255,0.38)]">
+          <span className="grid h-12 w-12 place-items-center rounded-xl border border-white/40 bg-brand-300/15 text-base font-bold text-brand-100 shadow-[0_0_28px_rgba(0,229,255,0.38)]">
             NE
           </span>
           <div>
-            <h1 className="text-xl font-semibold tracking-tight text-zinc-50">Conference Reg</h1>
+            <h1 className="text-2xl font-semibold tracking-tight text-zinc-50 sm:text-xl">Conference Reg</h1>
             <p className="mt-1 text-sm text-zinc-400">Staff sign-in</p>
           </div>
         </div>
@@ -43,7 +43,7 @@ export function LoginScreen() {
             autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="futuristic-input mt-1 h-10 w-full"
+            className="futuristic-input mt-1 h-11 w-full"
           />
         </label>
 
@@ -55,7 +55,7 @@ export function LoginScreen() {
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="futuristic-input mt-1 h-10 w-full"
+            className="futuristic-input mt-1 h-11 w-full"
           />
         </label>
 
@@ -65,7 +65,7 @@ export function LoginScreen() {
           </p>
         )}
 
-        <button type="submit" disabled={submitting} className="primary-action w-full">
+        <button type="submit" disabled={submitting} className="primary-action w-full h-11">
           {submitting ? 'Signing in...' : 'Sign in'}
         </button>
       </form>
