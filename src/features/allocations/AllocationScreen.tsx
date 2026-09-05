@@ -35,6 +35,7 @@ export function AllocationScreen() {
   const [mode, setMode] = useState<Mode>('mix_states')
   const [stateFilter, setStateFilter] = useState<string | 'ALL'>('ALL')
   const [pinnedMap, setPinnedMap] = useState<Map<string, string>>(new Map())
+  const [allocationMap, setAllocationMap] = useState<Map<string, string>>(new Map())
   const [removedIds, setRemovedIds] = useState<Set<string>>(new Set())
   const [search, setSearch] = useState('')
 
@@ -51,6 +52,7 @@ export function AllocationScreen() {
         const pool = (a ?? []).map((rec) => ({
           regId: rec.id,
           fullName: rec.full_name,
+          arrived: rec.arrived,
           whatsapp: rec.whatsapp,
           email: rec.email,
           togetherGroup: rec.together_group,
@@ -65,6 +67,7 @@ export function AllocationScreen() {
           if (al.pinned) pmap.set(al.attendee_id, al.room_id)
         }
         setPinnedMap(pmap)
+        setAllocationMap(new Map((allocs || []).map((allocation) => [allocation.attendee_id, allocation.room_id])))
         setAttendees(pool)
       })
       .catch(console.error)
@@ -90,14 +93,24 @@ export function AllocationScreen() {
 
   const computed = useMemo(() => {
     if (attendees.length === 0 || allocationRooms.length === 0) return null
-    const withPins = attendees.map((a) => ({ ...a, pinnedRoomId: pinnedMap.get(a.regId) ?? null }))
+    const availableRooms = allocationRooms.map((room) => ({
+      ...room,
+      capacity: Math.max(0, room.capacity - [...allocationMap.values()].filter((roomId) => roomId === room.id).length),
+    }))
+    const candidates = attendees
+      .filter((attendee) => attendee.arrived && !allocationMap.has(attendee.regId))
+      .filter((attendee) => stateFilter === 'ALL' || attendee.state === stateFilter)
     const results = allocate(
-      stateFilter === 'ALL' ? withPins : withPins.filter((x) => x.state === stateFilter),
-      allocationRooms,
+      candidates,
+      availableRooms,
       mode,
     )
-    return results.map((result) => removedIds.has(result.attendeeId) ? { ...result, roomId: null } : result)
-  }, [allocationRooms, attendees, mode, pinnedMap, removedIds, stateFilter])
+    const existing = attendees
+      .filter((attendee) => allocationMap.has(attendee.regId))
+      .filter((attendee) => stateFilter === 'ALL' || attendee.state === stateFilter)
+      .map((attendee) => ({ attendeeId: attendee.regId, roomId: allocationMap.get(attendee.regId)! }))
+    return [...existing, ...results.map((result) => removedIds.has(result.attendeeId) ? { ...result, roomId: null } : result)]
+  }, [allocationMap, allocationRooms, attendees, mode, removedIds, stateFilter])
 
   useEffect(() => setPreview(computed ?? null), [computed])
 
@@ -106,10 +119,15 @@ export function AllocationScreen() {
     setBusy(true)
     try {
       const rows = preview
-        .filter((p): p is { attendeeId: string; roomId: string } => p.roomId !== null)
+        .filter((p): p is { attendeeId: string; roomId: string } => p.roomId !== null && !allocationMap.has(p.attendeeId))
         .map((p) => ({ attendeeId: p.attendeeId, roomId: p.roomId }))
       await commitAllocations(rows)
-      alert('Allocations committed')
+      setAllocationMap((current) => {
+        const next = new Map(current)
+        for (const row of rows) next.set(row.attendeeId, row.roomId)
+        return next
+      })
+      alert(`${rows.length} allocation${rows.length === 1 ? '' : 's'} committed`)
     } catch (err: any) {
       console.error(err)
       alert('Commit failed: ' + err.message)
@@ -124,6 +142,7 @@ export function AllocationScreen() {
     try {
       await pinAllocation(attendeeId, roomId)
       setPinnedMap(new Map(pinnedMap).set(attendeeId, roomId))
+      setAllocationMap((current) => new Map(current).set(attendeeId, roomId))
       setRemovedIds((current) => {
         const next = new Set(current)
         next.delete(attendeeId)
@@ -145,6 +164,11 @@ export function AllocationScreen() {
       const m = new Map(pinnedMap)
       m.delete(attendeeId)
       setPinnedMap(m)
+      setAllocationMap((current) => {
+        const next = new Map(current)
+        next.delete(attendeeId)
+        return next
+      })
       alert('Unpinned')
     } catch (err: any) {
       console.error(err)
@@ -161,6 +185,11 @@ export function AllocationScreen() {
     try {
       await removeAllocation(attendeeId)
       setPinnedMap((current) => {
+        const next = new Map(current)
+        next.delete(attendeeId)
+        return next
+      })
+      setAllocationMap((current) => {
         const next = new Map(current)
         next.delete(attendeeId)
         return next

@@ -9,6 +9,7 @@ export function RoomsScreen() {
   const [rooms, setRooms] = useState<any[]>([])
   const [busy, setBusy] = useState(false)
   const [editing, setEditing] = useState<any | null>(null)
+  const [createRoomOpen, setCreateRoomOpen] = useState(false)
   const [form, setForm] = useState({
     block: '',
     room_number: '',
@@ -35,6 +36,7 @@ export function RoomsScreen() {
 
   function resetForm() {
     setEditing(null)
+    setCreateRoomOpen(false)
     setForm({
       block: '',
       room_number: '',
@@ -67,6 +69,7 @@ export function RoomsScreen() {
 
   async function handleEdit(r: any) {
     setEditing(r)
+    setCreateRoomOpen(true)
     setForm({
       block: r.block,
       room_number: r.room_number,
@@ -114,13 +117,27 @@ export function RoomsScreen() {
 
         <div className="grid gap-4 lg:grid-cols-[minmax(0,28rem)_1fr]">
           <Card className="p-4">
-            <form className="space-y-4" onSubmit={handleSubmit}>
+            <div className="flex items-center justify-between gap-3">
               <div>
                 <h2 className="text-base font-semibold text-zinc-50">
                   {editing ? 'Edit room' : 'Create room'}
                 </h2>
                 <p className="mt-1 text-sm text-zinc-400">Room details are used by allocation rules.</p>
               </div>
+              <button
+                type="button"
+                className="secondary-action inline-flex shrink-0 items-center gap-2 px-3 py-1.5"
+                onClick={() => setCreateRoomOpen((open) => !open)}
+                aria-expanded={createRoomOpen}
+              >
+                Click to create
+                <svg className={'h-4 w-4 transition-transform ' + (createRoomOpen ? 'rotate-180' : '')} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+            </div>
+
+            {createRoomOpen && <form className="mt-4 space-y-4" onSubmit={handleSubmit}>
 
               <div className="grid grid-cols-2 gap-2">
                 <label className="block">
@@ -220,7 +237,7 @@ export function RoomsScreen() {
                   </button>
                 )}
               </div>
-            </form>
+            </form>}
           </Card>
 
           <Card className="p-4">

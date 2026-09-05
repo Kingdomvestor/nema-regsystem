@@ -13,14 +13,10 @@ export async function commitAllocations(rows: CommitAllocation[]): Promise<void>
     .in('attendee_id', rows.map((row) => row.attendeeId))
   if (existingError) throw new Error(existingError.message)
 
-  const pinned = new Map(
-    (existing ?? [])
-      .filter((allocation) => allocation.pinned)
-      .map((allocation) => [allocation.attendee_id, allocation.room_id]),
-  )
+  const existingIds = new Set((existing ?? []).map((allocation) => allocation.attendee_id))
   const payload = rows
-    .filter((row) => row.roomId && (!pinned.has(row.attendeeId) || pinned.get(row.attendeeId) === row.roomId))
-    .map((row) => ({ attendee_id: row.attendeeId, room_id: row.roomId, pinned: !!row.pinned || pinned.has(row.attendeeId) }))
+    .filter((row) => row.roomId && !existingIds.has(row.attendeeId))
+    .map((row) => ({ attendee_id: row.attendeeId, room_id: row.roomId, pinned: !!row.pinned }))
 
   if (payload.length === 0) return
 

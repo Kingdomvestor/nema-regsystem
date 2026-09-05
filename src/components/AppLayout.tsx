@@ -50,7 +50,7 @@ export function AppLayout({
                 NE
               </span>
               <span className="text-sm font-semibold text-zinc-100 sm:block">
-                Conference Reg
+                Nema Conference
               </span>
             </div>
 

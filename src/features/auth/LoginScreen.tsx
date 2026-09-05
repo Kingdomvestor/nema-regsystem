@@ -30,7 +30,7 @@ export function LoginScreen() {
             NE
           </span>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-zinc-50 sm:text-xl">Conference Reg</h1>
+            <h1 className="text-2xl font-semibold tracking-tight text-zinc-50 sm:text-xl">Nema Conference</h1>
             <p className="mt-1 text-sm text-zinc-400">Staff sign-in</p>
           </div>
         </div>

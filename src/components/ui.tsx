@@ -49,17 +49,17 @@ export function StatCard({
   icon?: ReactNode
 }) {
   return (
-    <div className={'mirror-card-quiet group flex min-h-28 flex-col border-l-4 p-5 transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_48px_rgba(0,229,255,0.08)] hover:ring-1 hover:ring-brand-300/20 ' + statBorderClass[tone]}>
-      <div className="flex min-w-0 items-center gap-6">
+    <div className={'mirror-card-quiet group flex min-h-20 flex-col border-l-4 p-3 transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_48px_rgba(0,229,255,0.08)] hover:ring-1 hover:ring-brand-300/20 sm:p-4 ' + statBorderClass[tone]}>
+      <div className="flex min-w-0 items-center gap-3">
         {icon && (
-          <div className={'grid h-16 w-16 shrink-0 place-items-center rounded-2xl border shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] ' + statIconClass[tone]}>
+          <div className={'grid h-10 w-10 shrink-0 place-items-center rounded-xl border shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] ' + statIconClass[tone]}>
             {icon}
           </div>
         )}
         <div className="min-w-0">
-          <div className={'text-3xl font-semibold tabular-nums ' + statToneClass[tone]}>{value}</div>
-          <div className={'mt-2 text-xs font-bold uppercase ' + statToneClass[tone]}>{label}</div>
-          {description && <p className="mt-2 text-sm text-zinc-400">{description}</p>}
+          <div className={'text-2xl font-semibold tabular-nums ' + statToneClass[tone]}>{value}</div>
+          <div className={'mt-1 text-[10px] font-bold uppercase leading-tight ' + statToneClass[tone]}>{label}</div>
+          {description && <p className="mt-1 text-xs leading-tight text-zinc-400">{description}</p>}
         </div>
       </div>
     </div>

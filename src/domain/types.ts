@@ -129,6 +129,7 @@ export interface ImportResult {
 export interface AttendeeForAllocation {
   regId: string
   fullName?: string
+  arrived?: boolean
   whatsapp?: string
   email?: string
   togetherGroup?: string | null
