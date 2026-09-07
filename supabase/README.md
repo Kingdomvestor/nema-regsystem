@@ -13,6 +13,7 @@ Run these **once, in order**, against the project:
 2. `migrations/0002_rls_policies.sql` — role helpers + Row-Level Security.
 3. `migrations/0003_allocation_preferences.sql` — together-group and accessible-room preferences.
 4. `migrations/0004_accommodation_staff_role.sql` — accommodation role and room/allocation permissions.
+5. `migrations/0005_remove_meals.sql` — remove the retired meal tables.
 
 Then do the one-time **first-admin bootstrap** (see below) so you can log in
 with a staff role.
@@ -47,18 +48,18 @@ permissions.
 
 ## Verify the migrations
 
-After applying `0001` then `0002`, run each query in the SQL editor and check
+After applying all migrations, run each query in the SQL editor and check
 the expected result.
 
 ```sql
--- 1) All six tables exist.
+-- 1) The active tables exist.
 select table_name from information_schema.tables
 where table_schema = 'public' order by 1;
--- Expect: allocations, attendees, meal_sessions, meal_tickets, rooms, staff
+-- Expect: allocations, attendees, rooms, staff
 ```
 
 ```sql
--- 2) RLS is enabled on all six.
+-- 2) RLS is enabled on all active tables.
 select relname, relrowsecurity from pg_class
 where relnamespace = 'public'::regnamespace and relkind = 'r' order by 1;
 -- Expect: relrowsecurity = true for every row.
@@ -75,7 +76,7 @@ where table_name = 'attendees' order by ordinal_position;
 select conname, pg_get_constraintdef(oid) from pg_constraint
 where contype = 'c' and connamespace = 'public'::regnamespace order by 1;
 -- Expect checks for accommodation_choice, private_room_type, room_class,
--- gender_designation, meal_type, role, capacity>0, day>=1.
+-- gender_designation, role, capacity>0.
 ```
 
 ```sql

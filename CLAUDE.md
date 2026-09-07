@@ -1,7 +1,7 @@
 # CLAUDE.md — Conference Reg & Room Allocation
 
 Internal, team-only web app for **NEMA South West Zonal Conference 2026**: import attendee
-Excel → clean & flag → allocate rooms (balance state + gender) → register meals → on-site
+Excel → clean & flag → allocate rooms (balance state + gender) → on-site
 mobile check-in (realtime). Attendees never log in.
 
 **Status:** Pre-scaffold. Design approved. Next = build Plan 1 (import & cleaning core, pure
@@ -28,7 +28,7 @@ Vercel · SheetJS (`xlsx`) for browser import · print-CSS PDFs · Vitest.
 - `src/domain/` — pure logic + `*.test.ts`: types, normalizeLocation, normalizeAccommodation,
   generateRegId, detectDuplicates, parseWorkbook, runImport
 - `src/lib/` — Supabase client, shared utils
-- `src/features/<screen>/` — import · attendees · rooms · allocation · meals · checkin · dashboard
+- `src/features/<screen>/` — import · attendees · rooms · allocation · checkin · dashboard
 - `src/components/` — shared UI
 - `supabase/` — schema + RLS migrations
 

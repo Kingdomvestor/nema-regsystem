@@ -6,7 +6,7 @@ I’m a software developer focused on building practical, user-friendly tools fo
 
 I enjoy working at the intersection of product thinking, data quality, and clean software architecture. In this project, I designed a conference registration system that handles spreadsheet imports, data cleanup, attendance tracking, room allocation, and event operations with a strong emphasis on privacy and human review.
 
-Conference registration and room allocation are difficult to manage when attendee data arrives in inconsistent spreadsheets and operations need to remain accurate under time pressure. This project builds a structured system for importing attendee records, cleaning and flagging bad data, normalizing locations and accommodation details, and balancing room assignments by state and gender. The app also supports meal tracking and mobile-friendly on-site check-in to keep event operations organized. It is built with React, TypeScript, Vite, Supabase, and SheetJS so the process remains fast, transparent, and easy to extend. I learned that strong data validation and clear separation between domain logic and UI are critical when working with messy imported records. I also learned that protecting privacy and designing for human review rather than silent fixes is essential in a real-world event environment.
+Conference registration and room allocation are difficult to manage when attendee data arrives in inconsistent spreadsheets and operations need to remain accurate under time pressure. This project builds a structured system for importing attendee records, cleaning and flagging bad data, normalizing locations and accommodation details, and balancing room assignments by state and gender. The app also supports mobile-friendly on-site check-in to keep event operations organized. It is built with React, TypeScript, Vite, Supabase, and SheetJS so the process remains fast, transparent, and easy to extend. I learned that strong data validation and clear separation between domain logic and UI are critical when working with messy imported records. I also learned that protecting privacy and designing for human review rather than silent fixes is essential in a real-world event environment.
 
 ## Overview
 
@@ -19,7 +19,6 @@ This is an internal web app for the NEMA South West Zonal Conference 2026. It is
 - Normalize location and accommodation fields for consistent processing
 - Flag records for human review instead of silently altering them
 - Balance room allocations by state and gender requirements
-- Track meal registration and attendee status
 - Support mobile-friendly on-site check-in workflows
 
 ## How it works
@@ -28,8 +27,7 @@ This is an internal web app for the NEMA South West Zonal Conference 2026. It is
 2. Validate and clean imported records in the domain layer.
 3. Review flagged entries before finalizing the import.
 4. Allocate rooms using attendee and room constraints.
-5. Manage meals and attendee status as the event proceeds.
-6. Use the mobile check-in flow for faster on-site verification.
+5. Use the mobile check-in flow for faster on-site verification.
 
 ## Stack
 
@@ -45,12 +43,11 @@ This is an internal web app for the NEMA South West Zonal Conference 2026. It is
 - Detect duplicates and data issues for human review
 - Normalize locations and accommodation values
 - Allocate rooms with balanced constraints
-- Track meal registration and attendee status
 - Support a mobile-friendly on-site check-in workflow
 
 ## Project status
 
-This project is currently in active development as an internal operations tool for a live conference workflow. The core import, normalization, and allocation flows are being built first, with attendee, meals, and check-in screens to follow as the event operations become more mature.
+This project is currently in active development as an internal operations tool for a live conference workflow. The core import, normalization, allocation, attendee, and check-in screens are being built as the event operations become more mature.
 
 ## Architecture
 
@@ -60,15 +57,13 @@ The system is split into a React + TypeScript frontend and a Supabase-backed dat
 - Domain logic: pure functions in `src/domain/` for parsing, normalization, duplication checks, and allocation rules
 - Data layer: Supabase for persistence, authentication, and row-level security
 - Import workflow: Excel ingestion through SheetJS with validation and review before commit
-- Event workflows: attendees, rooms, allocations, meals, and on-site check-in
+- Event workflows: attendees, rooms, allocations, and on-site check-in
 
 ## Screenshots
 
-The interfaces are designed around a dark operational dashboard with high-contrast status cards and compact review tables. The screens below reflect the current UI direction for attendees, meals, allocation preview, and room management.
+The interfaces are designed around a dark operational dashboard with high-contrast status cards and compact review tables. The screens below reflect the current UI direction for attendees, allocation preview, and room management.
 
 ![Attendee dashboard](docs/assets/attendees-dashboard.png)
-
-![Meal sessions](docs/assets/meals-dashboard.png)
 
 ![Allocation preview](docs/assets/allocation-preview.png)
 
@@ -82,8 +77,7 @@ The interfaces are designed around a dark operational dashboard with high-contra
 2. Review duplicates, invalid records, and normalization issues.
 3. Confirm cleaned data before final import.
 4. Allocate rooms based on room capacity and attendee constraints.
-5. Manage meals and attendance state during the event.
-6. Check in attendees on-site using the mobile-friendly operational view.
+5. Check in attendees on-site using the mobile-friendly operational view.
 
 ## Known limitations
 
@@ -145,7 +139,6 @@ This project handles attendee information and should be treated as a sensitive o
 - Complete import and data-cleaning core
 - Add attendee review and edit flows
 - Finalize room allocation rules and warnings
-- Implement meal registration workflows
 - Build real-time on-site check-in support
 - Connect the app to production Supabase and deploy to Vercel
 

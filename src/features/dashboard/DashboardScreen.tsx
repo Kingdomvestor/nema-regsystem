@@ -4,7 +4,7 @@ import { Card, StatCard } from '../../components/ui'
 import { supabase } from '../../lib/supabase'
 import { fetchDashboardData, type DashboardData } from './dashboardApi'
 
-const emptyData: DashboardData = { attendees: [], rooms: [], allocations: [], sessions: [], tickets: [] }
+const emptyData: DashboardData = { attendees: [], rooms: [], allocations: [] }
 
 export default function DashboardScreen() {
   const [data, setData] = useState<DashboardData>(emptyData)
@@ -30,8 +30,6 @@ export default function DashboardScreen() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'attendees' }, () => void load())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'allocations' }, () => void load())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms' }, () => void load())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'meal_sessions' }, () => void load())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'meal_tickets' }, () => void load())
       .subscribe()
 
     return () => {
@@ -60,7 +58,7 @@ export default function DashboardScreen() {
   }, [data])
 
   return (
-    <AppLayout title="Operations dashboard" subtitle="A live read on attendance, rooms, allocations, and meals.">
+    <AppLayout title="Operations dashboard" subtitle="A live read on attendance, rooms, and allocations.">
       {loading && <Card className="p-8 text-center text-sm text-zinc-400">Loading operational data...</Card>}
       {error && <div className="rounded-lg border border-red-300/30 bg-red-400/10 p-3 text-sm text-red-200">{error}</div>}
       {!loading && !error && (
@@ -103,17 +101,6 @@ export default function DashboardScreen() {
               <p className="mt-4 text-sm text-zinc-400">Total capacity: <span className="font-semibold text-zinc-100">{summary.capacity}</span> beds</p>
             </Card>
 
-            <Card className="p-4 lg:col-span-2">
-              <div className="mb-4 flex items-center justify-between gap-3"><h2 className="text-base font-semibold text-zinc-50">Meal headcount</h2><span className="chip">{data.sessions.length} sessions</span></div>
-              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {data.sessions.map((session) => {
-                  const tickets = data.tickets.filter((ticket) => ticket.session_id === session.id && ticket.registered)
-                  const collected = tickets.filter((ticket) => ticket.collected).length
-                  return <div key={session.id} className="rounded-lg border border-white/10 bg-white/[0.05] p-3"><div className="flex justify-between gap-3"><span className="font-medium text-zinc-100">{session.name}</span><span className="text-xs uppercase text-zinc-500">{session.meal_type}</span></div><p className="mt-2 text-sm text-zinc-400">{collected} collected of {tickets.length} registered</p></div>
-                })}
-                {data.sessions.length === 0 && <p className="text-sm text-zinc-400">No meal sessions defined yet.</p>}
-              </div>
-            </Card>
           </div>
         </div>
       )}

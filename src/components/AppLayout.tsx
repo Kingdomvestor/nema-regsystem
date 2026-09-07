@@ -107,7 +107,6 @@ export function AppLayout({
                 <NavLink to="/allocations" className={tabClass}>
                   Allocations
                 </NavLink>
-                {isAdmin && <NavLink to="/meals" className={tabClass}>Meals</NavLink>}
               </>
             )}
           </nav>

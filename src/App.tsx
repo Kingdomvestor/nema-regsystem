@@ -5,7 +5,6 @@ import { LoginScreen } from './features/auth/LoginScreen'
 import { ImportScreen } from './features/import/ImportScreen'
 import RoomsScreen from './features/rooms/RoomsScreen'
 import AllocationScreen from './features/allocations/AllocationScreen'
-import MealsScreen from './features/meals/MealsScreen'
 import DashboardScreen from './features/dashboard/DashboardScreen'
 import CheckinScreen from './features/checkin/CheckinScreen'
 
@@ -58,14 +57,6 @@ export default function App() {
         element={
           <ProtectedRoute requireAccommodation>
             <AllocationScreen />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/meals"
-        element={
-          <ProtectedRoute requireAdmin>
-            <MealsScreen />
           </ProtectedRoute>
         }
       />
