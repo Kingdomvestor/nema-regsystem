@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { AppLayout } from '../../components/AppLayout'
 import { Card, StatCard } from '../../components/ui'
 import { supabase } from '../../lib/supabase'
@@ -65,7 +66,13 @@ export default function DashboardScreen() {
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             <StatCard label="Registered" value={data.attendees.length} tone="brand" />
-            <StatCard label="Arrived" value={`${summary.arrived}/${data.attendees.length}`} tone="blue" />
+            <Link
+              to="/checkin?arrived=only"
+              className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300/60"
+              aria-label={`View ${summary.arrived} arrived attendees`}
+            >
+              <StatCard label="Arrived" value={`${summary.arrived}/${data.attendees.length}`} tone="blue" description="View checked-in attendees" />
+            </Link>
             <StatCard label="Allocated" value={`${summary.allocated}/${data.attendees.length}`} />
             <StatCard label="Needs review" value={summary.flagged} tone={summary.flagged ? 'amber' : 'default'} />
           </div>

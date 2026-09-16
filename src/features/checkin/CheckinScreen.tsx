@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { AppLayout } from '../../components/AppLayout'
 import { Card } from '../../components/ui'
 import { supabase } from '../../lib/supabase'
@@ -8,6 +9,23 @@ import { fetchAllocations } from '../allocations/allocationsApi'
 import { fetchRooms, type RoomRecord } from '../rooms/roomsApi'
 
 type Allocation = { attendee_id: string; room_id: string }
+const STATE_OPTIONS = ['Kwara', 'Lagos', 'Ogun', 'Oyo', 'Ekiti', 'Osun', 'Ondo'] as const
+type StateFilter = (typeof STATE_OPTIONS)[number] | 'Unknown'
+
+function csvCell(value: unknown) {
+  const text = value === null || value === undefined ? '' : String(value)
+  return `"${text.replace(/"/g, '""')}"`
+}
+
+function DownloadIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+      <path d="M12 3v12" />
+      <path d="m7 10 5 5 5-5" />
+      <path d="M5 21h14" />
+    </svg>
+  )
+}
 
 function matches(attendee: AttendeeRecord, query: string) {
   const needle = query.trim().toLowerCase()
@@ -17,14 +35,17 @@ function matches(attendee: AttendeeRecord, query: string) {
 }
 
 export default function CheckinScreen() {
+  const [searchParams] = useSearchParams()
   const [attendees, setAttendees] = useState<AttendeeRecord[]>([])
   const [allocations, setAllocations] = useState<Allocation[]>([])
   const [rooms, setRooms] = useState<RoomRecord[]>([])
   const [query, setQuery] = useState('')
+  const [stateFilter, setStateFilter] = useState<StateFilter | 'all'>('all')
   const [loading, setLoading] = useState(true)
   const [busyId, setBusyId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [offline, setOffline] = useState(() => !navigator.onLine)
+  const arrivedOnly = searchParams.get('arrived') === 'only'
 
   async function load() {
     setLoading(true)
@@ -64,7 +85,47 @@ export default function CheckinScreen() {
 
   const roomById = useMemo(() => new Map(rooms.map((room) => [room.id, room])), [rooms])
   const allocationByAttendee = useMemo(() => new Map(allocations.map((allocation) => [allocation.attendee_id, allocation.room_id])), [allocations])
-  const results = useMemo(() => attendees.filter((attendee) => matches(attendee, query)).slice(0, 30), [attendees, query])
+  const stateOptions = useMemo<StateFilter[]>(
+    () => [...STATE_OPTIONS, ...(attendees.some((attendee) => attendee.state === null) ? ['Unknown' as const] : [])],
+    [attendees],
+  )
+  const stateAttendees = useMemo(
+    () => attendees.filter((attendee) =>
+      (!arrivedOnly || attendee.arrived) && (stateFilter === 'all' || (attendee.state ?? 'Unknown') === stateFilter),
+    ),
+    [arrivedOnly, attendees, stateFilter],
+  )
+  const results = useMemo(() => stateAttendees.filter((attendee) => matches(attendee, query)).slice(0, 30), [stateAttendees, query])
+  const arrivedCount = stateAttendees.filter((attendee) => attendee.arrived).length
+
+  function exportArrived() {
+    const header = ['RegID', 'Name', 'WhatsApp', 'Email', 'State', 'Gender', 'Accommodation', 'Room', 'ArrivedAt']
+    const lines = stateAttendees
+      .filter((attendee) => attendee.arrived)
+      .map((attendee) => {
+        const room = roomById.get(allocationByAttendee.get(attendee.id) ?? '')
+        return [
+          attendee.id,
+          attendee.full_name,
+          attendee.whatsapp,
+          attendee.email,
+          attendee.state ?? attendee.location_raw,
+          attendee.gender,
+          attendee.accommodation_choice ?? '',
+          room ? `${room.block} ${room.room_number}` : '',
+          attendee.arrived_at ?? '',
+        ].map(csvCell).join(',')
+      })
+    const blob = new Blob([[header.map(csvCell).join(','), ...lines].join('\n')], { type: 'text/csv;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${stateFilter === 'all' ? 'all' : stateFilter.toLowerCase()}-arrived-attendees.csv`
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    URL.revokeObjectURL(url)
+  }
 
   async function toggleArrival(attendee: AttendeeRecord) {
     setBusyId(attendee.id)
@@ -81,20 +142,54 @@ export default function CheckinScreen() {
   }
 
   return (
-    <AppLayout title="Check-in desk" subtitle="Search by name, phone, email, or registration ID and mark arrival.">
+    <AppLayout
+      title="Check-in desk"
+      subtitle={arrivedOnly ? 'Viewing checked-in attendees. Filter by state or search by name, phone, email, or registration ID.' : 'Search by name, phone, email, or registration ID and mark arrival.'}
+      actionsAtTop
+      actions={
+        <button
+          type="button"
+          className="secondary-action inline-flex items-center gap-2"
+          onClick={exportArrived}
+          disabled={arrivedCount === 0}
+          aria-label={`Export ${arrivedCount} arrived attendees`}
+        >
+          <DownloadIcon />
+          Export arrived ({arrivedCount})
+        </button>
+      }
+    >
       <div className="mx-auto max-w-7xl space-y-4">
         <Card className="p-3 sm:p-6">
-          <label className="block">
-            <span className="field-label">Find attendee</span>
-            <input
-              autoFocus
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Name, phone, email, or RegID"
-              className="futuristic-input mt-1 h-12 w-full text-base sm:h-14 sm:text-lg"
-            />
-          </label>
+          <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_12rem] sm:items-end">
+            <label className="block">
+              <span className="field-label">Find attendee</span>
+              <input
+                autoFocus
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Name, phone, email, or RegID"
+                className="futuristic-input mt-1 h-12 w-full text-base sm:h-14 sm:text-lg"
+              />
+            </label>
+            <label className="block">
+              <span className="field-label">Check by state</span>
+              <select
+                value={stateFilter}
+                onChange={(event) => setStateFilter(event.target.value as StateFilter | 'all')}
+                className="futuristic-input mt-1 h-12 w-full sm:h-14"
+              >
+                <option value="all">All states</option>
+                {stateOptions.map((state) => <option key={state} value={state}>{state}</option>)}
+              </select>
+            </label>
+          </div>
         </Card>
+
+        <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-zinc-300">
+          <span>{arrivedOnly ? 'Checked in' : stateFilter === 'all' ? 'All states' : stateFilter}: {arrivedOnly ? stateAttendees.length : `${arrivedCount} arrived of ${stateAttendees.length}`}</span>
+          <span className="text-zinc-500">Showing {Math.min(results.length, 30)} of {stateAttendees.length}</span>
+        </div>
 
         {offline && (
           <div className="rounded-md border border-amber-300/30 bg-amber-300/10 p-3 text-sm text-amber-100">
@@ -136,7 +231,7 @@ export default function CheckinScreen() {
                       : 'success-action min-h-12 w-full sm:w-auto sm:min-w-32'
                   }
                 >
-                  {busyId === attendee.id ? 'Saving...' : attendee.arrived ? 'Arrived' : 'Mark arrived'}
+                  {busyId === attendee.id ? 'Saving...' : attendee.arrived ? 'Mark not arrived' : 'Mark arrived'}
                 </button>
               </Card>
             )
