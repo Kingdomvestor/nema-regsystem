@@ -7,6 +7,7 @@ import RoomsScreen from './features/rooms/RoomsScreen'
 import AllocationScreen from './features/allocations/AllocationScreen'
 import DashboardScreen from './features/dashboard/DashboardScreen'
 import CheckinScreen from './features/checkin/CheckinScreen'
+import RegistrationScreen from './features/registration/RegistrationScreen'
 
 export default function App() {
   return (
@@ -25,6 +26,14 @@ export default function App() {
         element={
           <ProtectedRoute requireAdmin>
             <ImportScreen />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/register"
+        element={
+          <ProtectedRoute requireAdmin>
+            <RegistrationScreen />
           </ProtectedRoute>
         }
       />

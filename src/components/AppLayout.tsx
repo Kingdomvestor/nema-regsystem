@@ -101,6 +101,7 @@ export function AppLayout({
             {canManageAccommodation && (
               <>
                 {isAdmin && <NavLink to="/import" className={tabClass}>Import</NavLink>}
+                {isAdmin && <NavLink to="/register" className={tabClass}>Register</NavLink>}
                 <NavLink to="/rooms" className={tabClass}>
                   Rooms
                 </NavLink>
