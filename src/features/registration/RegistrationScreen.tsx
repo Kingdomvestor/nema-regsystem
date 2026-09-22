@@ -112,14 +112,14 @@ export default function RegistrationScreen() {
           <h2 className="section-label">Classification</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <label className="block">
-              <span className="field-label">State *</span>
-              <select required value={form.state} onChange={(event) => updateField('state', event.target.value)} className="futuristic-input mt-1 h-11 w-full">
+              <span className="field-label">State</span>
+              <select value={form.state} onChange={(event) => updateField('state', event.target.value)} className="futuristic-input mt-1 h-11 w-full">
                 <option value="">Select state</option>
                 {states.map((state) => <option key={state} value={state}>{state}</option>)}
               </select>
             </label>
             <Field label="Occupation" name="occupation" value={form.occupation} onChange={updateField} />
-            <Field label="Gender" name="gender" value={form.gender} onChange={updateField} required />
+            <Field label="Gender" name="gender" value={form.gender} onChange={updateField} />
             <Field label="Marital status" name="maritalStatus" value={form.maritalStatus} onChange={updateField} />
             <Field label="How did they hear about the conference?" name="heardVia" value={form.heardVia} onChange={updateField} />
             <label className="flex items-center gap-3 self-end text-sm text-zinc-300">
